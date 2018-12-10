@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: افزونه پرداخت پی‌پینگ برای Gravity forms
-Version: 1.0
+Version: 2.3.0
 Description:  افزونه درگاه پرداخت پی‌پینگ برای Gravity forms
 Plugin URI: https://www.payping.ir/
 Author: Erfan Ebrahimi
