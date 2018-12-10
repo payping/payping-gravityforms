@@ -2241,7 +2241,7 @@ class GFPersian_Gateway_payping {
 
 
 			if ( ! empty( $entry["payment_date"] ) ) {
-				/*
+				
                 if( ! class_exists("GFFormDisplay") )
                     require_once(GFCommon::get_base_path() . "/form_display.php");
 
@@ -2252,10 +2252,10 @@ class GFPersian_Gateway_payping {
                 $confirmation = __('نتیجه تراکنش قبلا مشخص شده است.' , 'gravityformspayping');
                 $confirmation   = empty( $confirmation ) ? "{$anchor} " : "{$anchor}<div id='gform_confirmation_wrapper_{$form['id']}' class='gform_confirmation_wrapper {$cssClass}'><div id='gform_confirmation_message_{$form['id']}' class='gform_confirmation_message_{$form['id']} gform_confirmation_message'>" . GFCommon::replace_variables( $confirmation, $form, $entry, false, true, $nl2br ) . '</div></div>';
                 GFFormDisplay::$submission[$form_id] = array("is_confirmation" => true, "confirmation_message" => $confirmation, "form" => $form, "entry" => $entry, "lead" => $entry,"page_number"=> 1);
-				*/
+				
 				return;
 			}
-
+    
 			global $current_user;
 			$user_id   = 0;
 			$user_name = __( "مهمان", "gravityformspayping" );
@@ -2284,18 +2284,16 @@ class GFPersian_Gateway_payping {
 					$Amount = GFPersian_Payments::amount( $Amount, 'IRT', $form, $entry );
 				}
 
-
-                
-
-					$Authority  = isset( $_GET['refId'] ) ? sanitize_text_field( $_GET['refId'] ) : '';
+					$Authority  = isset( $_GET['refid'] ) ?  $_GET['refid']  : '';
 					$MerchantID = self::get_merchent();
 
 					try {
 
-						$__params = $Amount . $Authority;
+						/*$__params = $Amount . $Authority;
 						if ( GFPersian_Payments::check_verification( $entry, __CLASS__, $__params ) ) {
 							return;
-						}
+						}*/
+						
 
 						$data = array('refId' => $_GET['refid'], 'amount' => $Amount);
 						$curl = curl_init();
