@@ -9,36 +9,36 @@ class GFPersian_DB_payping {
 	private static $method = 'payping';
 
 	public static function update_table() {
-
 		global $wpdb;
-
+	
 		$table_name = self::get_table_name();
-
+	
 		$old_table = $wpdb->prefix . "rg_payping";
-		if ( $wpdb->get_var( "SHOW TABLES LIKE '$old_table'" ) ) {
-			$wpdb->query( "RENAME TABLE $old_table TO $table_name" );
+		if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $old_table))) {
+			$wpdb->query($wpdb->prepare("RENAME TABLE %s TO %s", $old_table, $table_name));
 		}
-
+	
 		$charset_collate = '';
-		if ( ! empty( $wpdb->charset ) ) {
-			$charset_collate = "DEFAULT CHARACTER SET $wpdb->charset";
+		if (!empty($wpdb->charset)) {
+			$charset_collate = "DEFAULT CHARACTER SET {$wpdb->charset}";
 		}
-		if ( ! empty( $wpdb->collate ) ) {
-			$charset_collate .= " COLLATE $wpdb->collate";
+		if (!empty($wpdb->collate)) {
+			$charset_collate .= " COLLATE {$wpdb->collate}";
 		}
-
+	
 		$feed = "CREATE TABLE IF NOT EXISTS $table_name (
-              id mediumint(8) unsigned not null auto_increment,
-              form_id mediumint(8) unsigned not null,
-              is_active tinyint(1) not null default 1,
-              meta longtext,
-              PRIMARY KEY  (id),
-              KEY form_id (form_id)
-		)$charset_collate;";
-
-		require_once( ABSPATH . '/wp-admin/includes/upgrade.php' );
-		dbDelta( $feed );
+				  id mediumint(8) unsigned not null auto_increment,
+				  form_id mediumint(8) unsigned not null,
+				  is_active tinyint(1) not null default 1,
+				  meta longtext,
+				  PRIMARY KEY  (id),
+				  KEY form_id (form_id)
+		) $charset_collate;";
+	
+		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+		dbDelta($feed);
 	}
+	
 
 	public static function get_table_name() {
 		global $wpdb;
