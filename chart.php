@@ -12,7 +12,7 @@ class GFPersian_Chart_payping {
 		$form_id = rgget( "id" );
 		$form    = RGFormsModel::get_form_meta( $form_id );
 		if ( empty( $form ) || ! is_numeric( $form_id ) || intval( $form_id ) != $form_id ) {
-			die( esc_html__( 'فرم درخواستی وجود ندارد.', 'gravityformspayping' ) );
+			die( esc_html__( 'فرم درخواستی وجود ندارد.', 'payping-gravityforms' ) );
 		}
 		?>
         <style type="text/css">
@@ -114,10 +114,17 @@ class GFPersian_Chart_payping {
 
 		wp_enqueue_style( "gform_datepicker_init", GFCommon::get_base_url() . "/css/datepicker.css", null, GFCommon::$version );
 		do_action( 'gf_gateway_js' );
+		function enqueue_custom_admin_script() {
+			wp_enqueue_script(
+				'shamsi-chart', 
+				esc_url(GFPersian_Payments::get_base_url()) . '/assets/js/shamsi_chart.js', 
+				array('jquery'), 
+				null, 
+				true
+			);
+		}
+		add_action('admin_enqueue_scripts', 'enqueue_custom_admin_script');
 		?>
-
-        <script type="text/javascript"
-                src="<?php echo esc_url(GFPersian_Payments::get_base_url()); ?>/assets/js/shamsi_chart.js"></script>
         <script type="text/javascript">
             var dp = jQuery.noConflict();
             dp(document).ready(function () {
@@ -132,77 +139,77 @@ class GFPersian_Chart_payping {
         <div class="wrap">
             <ul class="subsubsub">
                 <li><a class="<?php echo ( ! rgget( "tab" ) || rgget( "tab" ) == "today" ) ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>"><?php esc_url_e( "امروز", "gravityformspayping" ); ?></a>
+                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>"><?php esc_html_e( "امروز", "payping-gravityforms" ); ?></a>
                     |
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "yesterday" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=yesterday"><?php esc_url_e( "دیروز", "gravityformspayping" ); ?></a>
+                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=yesterday"><?php esc_html_e( "دیروز", "payping-gravityforms" ); ?></a>
                     |
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "last7days" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=last7days"><?php esc_url_e( "هفت روز گذشته", "gravityformspayping" ); ?></a>
+                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=last7days"><?php esc_html_e( "هفت روز گذشته", "payping-gravityforms" ); ?></a>
                     |
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "thisweek" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=thisweek"><?php esc_url_e( "هفته جاری", "gravityformspayping" ); ?></a>
+                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=thisweek"><?php esc_html_e( "هفته جاری", "payping-gravityforms" ); ?></a>
                     |
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "last30days" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=last30days"><?php esc_url_e( "30 روز گذشته", "gravityformspayping" ); ?></a>
+                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=last30days"><?php esc_html_e( "30 روز گذشته", "payping-gravityforms" ); ?></a>
                     |
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "thismonth" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=thismonth"><?php esc_url_e( "ماه جاری", "gravityformspayping" ); ?></a>|
+                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=thismonth"><?php esc_html_e( "ماه جاری", "payping-gravityforms" ); ?></a>|
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "lastmonth" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=lastmonth"><?php esc_url_e( "ماه قبل", "gravityformspayping" ); ?></a>|
+                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=lastmonth"><?php esc_html_e( "ماه قبل", "payping-gravityforms" ); ?></a>|
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "last2month" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=last2month"><?php esc_url_e( "2 ماه اخیر", "gravityformspayping" ); ?></a>
+                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=last2month"><?php esc_html_e( "2 ماه اخیر", "payping-gravityforms" ); ?></a>
                     |
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "last3month" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=last3month"><?php esc_url_e( "3 ماه اخیر", "gravityformspayping" ); ?></a>
+                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=last3month"><?php esc_html_e( "3 ماه اخیر", "payping-gravityforms" ); ?></a>
                     |
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "last6month" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=last6month"><?php esc_url_e( "6 ماه اخیر", "gravityformspayping" ); ?></a>
+                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=last6month"><?php esc_html_e( "6 ماه اخیر", "payping-gravityforms" ); ?></a>
                     |
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "last9month" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=last9month"><?php esc_url_e( "9 ماه اخیر", "gravityformspayping" ); ?></a>
+                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=last9month"><?php esc_html_e( "9 ماه اخیر", "payping-gravityforms" ); ?></a>
                     |
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "last12month" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=last12month"><?php esc_url_e( "یک سال اخیر", "gravityformspayping" ); ?></a>
+                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=last12month"><?php esc_html_e( "یک سال اخیر", "payping-gravityforms" ); ?></a>
                     |
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "spring" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=spring"><?php esc_url_e( "بهار", "gravityformspayping" ); ?></a>|
+                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=spring"><?php esc_html_e( "بهار", "payping-gravityforms" ); ?></a>|
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "summer" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=summer"><?php esc_url_e( "تابستان", "gravityformspayping" ); ?></a>|
+                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=summer"><?php esc_html_e( "تابستان", "payping-gravityforms" ); ?></a>|
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "fall" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=fall"><?php esc_url_e( "پاییز", "gravityformspayping" ); ?></a>|
+                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=fall"><?php esc_html_e( "پاییز", "payping-gravityforms" ); ?></a>|
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "winter" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=winter"><?php esc_url_e( "زمستان", "gravityformspayping" ); ?></a>|
+                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=winter"><?php esc_html_e( "زمستان", "payping-gravityforms" ); ?></a>|
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "thisyear" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=thisyear"><?php esc_url_e( "امسال", "gravityformspayping" ); ?></a>
+                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=thisyear"><?php esc_html_e( "امسال", "payping-gravityforms" ); ?></a>
                 </li>
                 <br/><br/>
                 <form method="post"
                       action="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( "id" )) ?>&tab=selection"><?php wp_nonce_field( "search", "gf_payping_chart" ) ?>
-                    <span><?php esc_url_e( 'از تاریخ', 'gravityformspayping' ) ?></span>
+                    <span><?php esc_html_e( 'از تاریخ', 'payping-gravityforms' ) ?></span>
                     <input type="text" name="min" class="datepicker"
-                           value="<?php echo sanitize_text_field( rgpost( 'min' ) ); ?>" autocomplete="off"/>
-                    <span style="margin-right:15px"><?php esc_url_e( 'تا تاریخ', 'gravityformspayping' ) ?></span>
+                           value="<?php echo esc_html(sanitize_text_field( rgpost( 'min' ) )); ?>" autocomplete="off"/>
+                    <span style="margin-right:15px"><?php esc_html_e( 'تا تاریخ', 'payping-gravityforms' ) ?></span>
                     <input type="text" name="max" class="datepicker"
-                           value="<?php echo sanitize_text_field( rgpost( 'max' ) ); ?>" autocomplete="off"/>
+                           value="<?php echo esc_html(sanitize_text_field( rgpost( 'max' ) )); ?>" autocomplete="off"/>
                     <input type="submit" class="button-primary button" name="submit"
-                           value="<?php esc_url_e( 'انتخاب', 'gravityformspayping' ) ?>"><br>
+                           value="<?php esc_html_e( 'انتخاب', 'payping-gravityforms' ) ?>"><br>
                 </form>
             </ul>
 
@@ -341,11 +348,11 @@ class GFPersian_Chart_payping {
             <hr>
 
             <div class="clear"></div>
-            <h2><?php esc_url_e( " درآمد از درگاه پی‌پینگ برای فرمِ ", "gravityformspayping" ) ?><?php echo esc_html( '"' . $form["title"] . '"' ); ?></h2>
+            <h2><?php esc_html_e( " درآمد از درگاه پی‌پینگ برای فرمِ ", "payping-gravityforms" ) ?><?php echo esc_html( '"' . $form["title"] . '"' ); ?></h2>
             <div>
 				<?php if ( empty( $chart_info["series"] ) ) { ?>
                     <div
-                            class="payping_message_container"><?php esc_url_e( "موردی یافت نشد . ", "gravityformspayping" ) ?></div>
+                            class="payping_message_container"><?php esc_html_e( "موردی یافت نشد . ", "payping-gravityforms" ) ?></div>
 				<?php } else { ?>
                     <div class="payping_graph_container">
                         <div id="graph_placeholder" style="width:100%;height:300px;"></div>
@@ -353,7 +360,7 @@ class GFPersian_Chart_payping {
 					<?php
 				}
 
-				$sales_label = esc_url__( "تعداد کل پرداخت های  پی‌پینگ این فرم", "gravityformspayping" );
+				$sales_label = __( "تعداد کل پرداخت های  پی‌پینگ این فرم", "payping-gravityforms" );
 
 				$transaction_totals = GFPersian_DB_payping::get_transaction_totals( $form_id );
 				$total_sales        = empty( $transaction_totals["active"]["transactions"] ) ? 0 : $transaction_totals["active"]["transactions"];
@@ -362,7 +369,7 @@ class GFPersian_Chart_payping {
                 <div class="payping_summary_container">
                     <div class="payping_summary_item">
                         <div
-                                class="payping_summary_title"><?php esc_url_e( 'جمع پرداخت های  پی‌پینگ این فرم', 'gravityformspayping' ) ?></div>
+                                class="payping_summary_title"><?php esc_html_e( 'جمع پرداخت های  پی‌پینگ این فرم', 'payping-gravityforms' ) ?></div>
                         <div
                                 class="payping_summary_value"><?php echo esc_html( GF_tr_num( GFCommon::to_money( $total_revenue ), 'fa' ) ); ?></div>
                     </div>
@@ -378,7 +385,7 @@ class GFPersian_Chart_payping {
                     </div>
 
                     <div class="payping_summary_item">
-                        <div class="payping_summary_title"><?php echo esc_html($sales_label); ?></div>
+                        <div class="payping_summary_title"><?php echo $sales_label; ?></div>
                         <div class="payping_summary_value"><?php echo esc_html(GF_tr_num( $total_sales, 'fa' )); ?></div>
                     </div>
 
@@ -398,11 +405,11 @@ class GFPersian_Chart_payping {
 
             <hr>
             <div class="clear"></div>
-            <h2><?php esc_url_e( " درآمد از همه روشها برای فرمِ ", "gravityformspayping" ) ?><?php echo esc_html('"' . $form["title"] . '"'); ?></h2>
+            <h2><?php esc_html_e( " درآمد از همه روشها برای فرمِ ", "payping-gravityforms" ) ?><?php echo esc_html('"' . $form["title"] . '"'); ?></h2>
             <div>
 				<?php if ( ! $chart_info_gateways["series"] ) { ?>
                     <div
-                            class="payping_message_container"><?php esc_url_e( "موردی یافت نشد . ", "gravityformspayping" ) ?></div>
+                            class="payping_message_container"><?php esc_html_e( "موردی یافت نشد . ", "payping-gravityforms" ) ?></div>
 				<?php } else { ?>
                     <div class="payping_graph_container">
                         <div id="graph_placeholder2" style="width:100%;height:300px;"></div>
@@ -410,7 +417,7 @@ class GFPersian_Chart_payping {
 					<?php
 				}
 
-				$sales_label = esc_html__( "تعداد کل پرداخت های  همه روشهای این فرم", "gravityformspayping" );
+				$sales_label = esc_html__( "تعداد کل پرداخت های  همه روشهای این فرم", "payping-gravityforms" );
 
 				$transaction_totals = GFPersian_DB_payping::get_transaction_totals_gateways( $form_id );
 				$total_sales        = empty( $transaction_totals["active"]["transactions"] ) ? 0 : $transaction_totals["active"]["transactions"];
@@ -421,7 +428,7 @@ class GFPersian_Chart_payping {
 
                     <div class="payping_summary_item">
                         <div
-                                class="payping_summary_title"><?php esc_url_e( "جمع پرداخت های  همه روشهای این فرم", "gravityformspayping" ) ?></div>
+                                class="payping_summary_title"><?php esc_html_e( "جمع پرداخت های  همه روشهای این فرم", "payping-gravityforms" ) ?></div>
                         <div
                                 class="payping_summary_value"><?php echo esc_html( GF_tr_num( GFCommon::to_money( $total_revenue ), 'fa' ) ); ?></div>
                     </div>
@@ -459,11 +466,11 @@ class GFPersian_Chart_payping {
             </div>
             <hr>
             <div class="clear"></div>
-            <h2><?php esc_url_e( " کل درآمد های پی‌پینگ", "gravityformspayping" ) ?></h2>
+            <h2><?php esc_html_e( " کل درآمد های پی‌پینگ", "payping-gravityforms" ) ?></h2>
             <div>
 				<?php if ( ! $chart_info_hannan["series"] ) { ?>
                     <div
-                            class="payping_message_container"><?php esc_url_e( "موردی یافت نشد . ", "gravityformspayping" ) ?></div>
+                            class="payping_message_container"><?php esc_html_e( "موردی یافت نشد . ", "payping-gravityforms" ) ?></div>
 				<?php } else { ?>
                     <div class="payping_graph_container">
                         <div id="graph_placeholder1" style="width:100%;height:300px;"></div>
@@ -471,7 +478,7 @@ class GFPersian_Chart_payping {
 					<?php
 				}
 
-				$sales_label = esc_html__( "تعداد کل پرداخت های درگاه پی‌پینگ", "gravityformspayping" );
+				$sales_label = esc_html__( "تعداد کل پرداخت های درگاه پی‌پینگ", "payping-gravityforms" );
 
 				$transaction_totals = GFPersian_DB_payping::get_transaction_totals_this_gateway();
 				$total_sales        = empty( $transaction_totals["active"]["transactions"] ) ? 0 : $transaction_totals["active"]["transactions"];
@@ -480,7 +487,7 @@ class GFPersian_Chart_payping {
                 <div class="payping_summary_container">
                     <div class="payping_summary_item">
                         <div
-                                class="payping_summary_title"><?php esc_url_e( "جمع پرداخت های  همه فرمهای پی‌پینگ", "gravityformspayping" ) ?></div>
+                                class="payping_summary_title"><?php esc_html_e( "جمع پرداخت های  همه فرمهای پی‌پینگ", "payping-gravityforms" ) ?></div>
                         <div
                                 class="payping_summary_value"><?php echo esc_html(GF_tr_num( GFCommon::to_money( $total_revenue ), 'fa' )); ?></div>
                     </div>
@@ -517,11 +524,11 @@ class GFPersian_Chart_payping {
             </div>
             <hr>
             <div class="clear"></div>
-            <h2><?php esc_url_e( " کل درآمد های سایت ( همه روشها برای همه فرم ها)", "gravityformspayping" ) ?></h2>
+            <h2><?php esc_html_e( " کل درآمد های سایت ( همه روشها برای همه فرم ها)", "payping-gravityforms" ) ?></h2>
             <div>
 				<?php if ( ! $chart_info_site["series"] ) { ?>
                     <div
-                            class="payping_message_container"><?php esc_url_e( "موردی یافت نشد . ", "gravityformspayping" ) ?></div>
+                            class="payping_message_container"><?php esc_html_e( "موردی یافت نشد . ", "payping-gravityforms" ) ?></div>
 				<?php } else { ?>
                     <div class="payping_graph_container">
                         <div id="graph_placeholder3" style="width:100%;height:300px;"></div>
@@ -529,7 +536,7 @@ class GFPersian_Chart_payping {
 					<?php
 				}
 
-				$sales_label = esc_html__( "تعداد کل پرداخت های همه فرمهای سایت", "gravityformspayping" );
+				$sales_label = esc_html__( "تعداد کل پرداخت های همه فرمهای سایت", "payping-gravityforms" );
 
 				$transaction_totals = GFPersian_DB_payping::get_transaction_totals_site();
 				$total_sales        = empty( $transaction_totals["active"]["transactions"] ) ? 0 : $transaction_totals["active"]["transactions"];
@@ -538,7 +545,7 @@ class GFPersian_Chart_payping {
                 <div class="payping_summary_container">
                     <div class="payping_summary_item">
                         <div
-                                class="payping_summary_title"><?php esc_html_e( "جمع کل پرداخت های همه فرمهای سایت", "gravityformspayping" ) ?></div>
+                                class="payping_summary_title"><?php esc_html_e( "جمع کل پرداخت های همه فرمهای سایت", "payping-gravityforms" ) ?></div>
                         <div
                                 class="payping_summary_value"><?php echo esc_html(GF_tr_num( GFCommon::to_money( $total_revenue ), 'fa' )); ?></div>
                     </div>
@@ -661,7 +668,7 @@ class GFPersian_Chart_payping {
 
             function getCurrentCurrency() {
 				<?php if ( ! class_exists( "RGCurrency" ) ) {
-				require_once( ABSPATH . "/" . PLUGINDIR . "/gravityforms/currency.php" );
+				require_once( ABSPATH . "/" . WP_PLUGIN_DIR . "/gravityforms/currency.php" );
 			}
 				$current_currency = RGCurrency::get_currency( GFCommon::get_currency() );
 				?>
@@ -759,71 +766,78 @@ class GFPersian_Chart_payping {
 		if ( $chart == 1 ) {
 			$c       = 'blue';
 			$dt      = "points: { symbol: 'diamond', fillColor: '#058DC7' }, color: '#058DC7'}";
-			$t       = esc_html__( 'پی‌پینگ این فرم', 'gravityformspayping' );
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-					FROM " . GFPersian_DB_payping::get_entry_table_name() . " l
-					WHERE form_id=%d AND l.status='active' AND l.is_fulfilled=1 AND l.payment_method='payping'
-					GROUP BY date(date)
-					ORDER BY payment_date DESC",
-					$tz_offset,
-					$form_id
-				)
+			$t       = esc_html__( 'پی‌پینگ این فرم', 'payping-gravityforms' );
+		
+			$query = $wpdb->prepare(
+				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
+				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				WHERE form_id = %d AND l.status = %s AND l.is_fulfilled = 1 AND l.payment_method = %s
+				GROUP BY DATE(l.payment_date)
+				ORDER BY l.payment_date DESC",
+				$tz_offset,
+				$form_id,
+				'active',
+				'payping'
 			);
-			
-		}
+		
+			$results = $wpdb->get_results( $query );
+		}		
 
 		if ( $chart == 2 ) {
 			$c       = 'green';
 			$dt      = "points: { symbol: 'square', fillColor: '#50B432' }, color: '#50B432'}";
-			$t       = esc_html__( 'همه روشهای این فرم', 'gravityformspayping' );
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-					FROM " . GFPersian_DB_payping::get_entry_table_name() . " l
-					WHERE form_id=%d AND l.status='active' AND l.is_fulfilled=1
-					GROUP BY date(date)
-					ORDER BY payment_date DESC",
-					$tz_offset,
-					$form_id
-				)
-			);			
+			$t       = esc_html__( 'همه روشهای این فرم', 'payping-gravityforms' );
+		
+			$query = $wpdb->prepare(
+				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
+				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				WHERE form_id = %d AND l.status = %s AND l.is_fulfilled = 1
+				GROUP BY DATE(l.payment_date)
+				ORDER BY l.payment_date DESC",
+				$tz_offset,
+				$form_id,
+				'active'
+			);
+		
+			$results = $wpdb->get_results( $query );
 		}
-
+		
 		if ( $chart == 3 ) {
 			$c       = 'orang';
 			$dt      = "}";
-			$t       = esc_html__( "همه فرمهای پی‌پینگ", 'gravityformspayping' );
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-					FROM " . GFPersian_DB_payping::get_entry_table_name() . " l
-					WHERE l.status='active' AND l.is_fulfilled=1 AND l.payment_method='payping'
-					GROUP BY date(date)
-					ORDER BY payment_date DESC",
-					$tz_offset
-				)
+			$t       = esc_html__( "همه فرمهای پی‌پینگ", 'payping-gravityforms' );
+		
+			$query = $wpdb->prepare(
+				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
+				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				WHERE l.status = %s AND l.is_fulfilled = 1 AND l.payment_method = %s
+				GROUP BY DATE(l.payment_date)
+				ORDER BY l.payment_date DESC",
+				$tz_offset,
+				'active',
+				'payping'
 			);
-			
+		
+			$results = $wpdb->get_results( $query );
 		}
-
+		
 		if ( $chart == 4 ) {
 			$c       = 'red';
 			$dt      = "points: { symbol: 'triangle', fillColor: '#AA4643' }, color: '#AA4643'}";
-			$t       = esc_html__( "همه فرمهای سایت", 'gravityformspayping' );
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-					FROM " . GFPersian_DB_payping::get_entry_table_name() . " l
-					WHERE l.status='active' AND l.is_fulfilled=1
-					GROUP BY date(date)
-					ORDER BY payment_date DESC",
-					$tz_offset
-				)
+			$t       = esc_html__( "همه فرمهای سایت", 'payping-gravityforms' );
+		
+			$query = $wpdb->prepare(
+				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
+				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				WHERE l.status = %s AND l.is_fulfilled = 1
+				GROUP BY DATE(l.payment_date)
+				ORDER BY l.payment_date DESC",
+				$tz_offset,
+				'active'
 			);
-			
-		}
+		
+			$results = $wpdb->get_results( $query );
+		}		
 
 		$sales_week   = 0;
 		$revenue_week = 0;
@@ -867,9 +881,9 @@ class GFPersian_Chart_payping {
 				$datat = isset( $datat ) ? $datat : '';
 				$data  .= "[{$timeX},{$datat}],";
 
-				$sales_line = "<div class='payping_tooltip_sales'><span class='payping_tooltip_heading'>" . esc_html__( "تعداد پرداخت ", "gravityformspayping" ) . ": </span><span class='payping_tooltip_value'>" . $result->new_sales . "</span></div>";
+				$sales_line = "<div class='payping_tooltip_sales'><span class='payping_tooltip_heading'>" . esc_html__( "تعداد پرداخت ", "payping-gravityforms" ) . ": </span><span class='payping_tooltip_value'>" . $result->new_sales . "</span></div>";
 
-				$tooltips .= "\"<div class='tooltipbox_" . $c . "'><div class='payping_tooltip_date'>" . $timeX_tooltips . "</div>{$sales_line}<div class='payping_tooltip_revenue'><span class='payping_tooltip_heading'>" . esc_html__( "پرداختی", "gravityformspayping" ) . ": </span><span class='payping_tooltip_value'>" . GFCommon::to_money( $result->amount_sold ) . "</span></div></div>\",";
+				$tooltips .= "\"<div class='tooltipbox_" . $c . "'><div class='payping_tooltip_date'>" . $timeX_tooltips . "</div>{$sales_line}<div class='payping_tooltip_revenue'><span class='payping_tooltip_heading'>" . esc_html__( "پرداختی", "payping-gravityforms" ) . ": </span><span class='payping_tooltip_value'>" . GFCommon::to_money( $result->amount_sold ) . "</span></div></div>\",";
 			}
 
 			$data     = substr( $data, 0, strlen( $data ) - 1 );
@@ -885,23 +899,23 @@ class GFPersian_Chart_payping {
 			}";
 		}
 		if ( $x == 7 ) {
-			$n   = esc_html__( '7 روز', 'gravityformspayping' );
+			$n   = esc_html__( '7 روز', 'payping-gravityforms' );
 			$mid = 7;
 		}
 		if ( $x == 30 ) {
-			$n   = esc_html__( '30 روز', 'gravityformspayping' );
+			$n   = esc_html__( '30 روز', 'payping-gravityforms' );
 			$mid = 30;
 		}
 
-		$sales_label = sprintf( esc_html__( "تعداد پرداخت های %s گذشته %s", 'gravityformspayping' ), $n, $t );
+		$sales_label = sprintf( esc_html__( "تعداد پرداخت های %s گذشته %s", 'payping-gravityforms' ), $n, $t );
 
 		$midt          = $mid ? $sales_week / $mid : 0;
-		$mid           = ( $mid ? GFCommon::to_money( $revenue_week / $mid ) : 0 ) . esc_html__( " در روز", 'gravityformspayping' );
-		$midt          = number_format( $midt, 3, '.', '' ) . esc_html__( " در روز", 'gravityformspayping' );
-		$midt_label    = sprintf( esc_html__( "میانگین تعداد پرداخت های %s گذشته %s", 'gravityformspayping' ), $n, $t );
-		$mid_label     = sprintf( esc_html__( "میانگین پرداخت های %s گذشته %s", 'gravityformspayping' ), $n, $t );
+		$mid           = ( $mid ? GFCommon::to_money( $revenue_week / $mid ) : 0 ) . esc_html__( " در روز", 'payping-gravityforms' );
+		$midt          = number_format( $midt, 3, '.', '' ) . esc_html__( " در روز", 'payping-gravityforms' );
+		$midt_label    = sprintf( esc_html__( "میانگین تعداد پرداخت های %s گذشته %s", 'payping-gravityforms' ), $n, $t );
+		$mid_label     = sprintf( esc_html__( "میانگین پرداخت های %s گذشته %s", 'payping-gravityforms' ), $n, $t );
 		$revenue_week  = GFCommon::to_money( $revenue_week );
-		$revenue_label = sprintf( esc_html__( "جمع پرداخت های %s گذشته %s", 'gravityformspayping' ), $n, $t );
+		$revenue_label = sprintf( esc_html__( "جمع پرداخت های %s گذشته %s", 'payping-gravityforms' ), $n, $t );
 
 		return array(
 			"series"        => $series,
@@ -932,73 +946,78 @@ class GFPersian_Chart_payping {
 		if ( $chart == 1 ) {
 			$c       = 'blue';
 			$dt      = "points: { symbol: 'diamond', fillColor: '#058DC7' }, color: '#058DC7'}";
-			$t       = esc_html__( "پی‌پینگ این فرم", 'gravityformspayping' );
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-					FROM " . GFPersian_DB_payping::get_entry_table_name() . " l
-					WHERE form_id = %d AND l.status='active' AND l.is_fulfilled=1 AND l.payment_method='payping'
-					GROUP BY date(date)
-					ORDER BY payment_date DESC",
-					$tz_offset,
-					$form_id
-				)
+			$t       = esc_html__( "پی‌پینگ این فرم", 'payping-gravityforms' );
+		
+			$query = $wpdb->prepare(
+				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
+				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				WHERE form_id = %d AND l.status = %s AND l.is_fulfilled = 1 AND l.payment_method = %s
+				GROUP BY DATE(l.payment_date)
+				ORDER BY l.payment_date DESC",
+				$tz_offset,
+				$form_id,
+				'active',
+				'payping'
 			);
-			
+		
+			$results = $wpdb->get_results( $query );
 		}
-
+		
 		if ( $chart == 2 ) {
 			$c       = 'green';
 			$dt      = "points: { symbol: 'square', fillColor: '#50B432' }, color: '#50B432'}";
-			$t       = esc_html__( "همه روشهای این فرم", 'gravityformspayping' );
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-					FROM " . GFPersian_DB_payping::get_entry_table_name() . " l
-					WHERE form_id = %d AND l.status='active' AND l.is_fulfilled=1
-					GROUP BY date(date)
-					ORDER BY payment_date DESC",
-					$tz_offset,
-					$form_id
-				)
+			$t       = esc_html__( "همه روشهای این فرم", 'payping-gravityforms' );
+		
+			$query = $wpdb->prepare(
+				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
+				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				WHERE form_id = %d AND l.status = %s AND l.is_fulfilled = 1
+				GROUP BY DATE(l.payment_date)
+				ORDER BY l.payment_date DESC",
+				$tz_offset,
+				$form_id,
+				'active'
 			);
-			
+		
+			$results = $wpdb->get_results( $query );
 		}
-
-
+		
 		if ( $chart == 3 ) {
 			$c       = 'orang';
 			$dt      = "}";
-			$t       = esc_html__( "همه فرمهای پی‌پینگ", 'gravityformspayping' );
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-					FROM " . GFPersian_DB_payping::get_entry_table_name() . " l
-					WHERE l.status='active' AND l.is_fulfilled=1 AND l.payment_method='payping'
-					GROUP BY date(date)
-					ORDER BY payment_date DESC",
-					$tz_offset
-				)
+			$t       = esc_html__( "همه فرمهای پی‌پینگ", 'payping-gravityforms' );
+		
+			$query = $wpdb->prepare(
+				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
+				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				WHERE l.status = %s AND l.is_fulfilled = 1 AND l.payment_method = %s
+				GROUP BY DATE(l.payment_date)
+				ORDER BY l.payment_date DESC",
+				$tz_offset,
+				'active',
+				'payping'
 			);
-			
+		
+			$results = $wpdb->get_results( $query );
 		}
-
+		
 		if ( $chart == 4 ) {
 			$c       = 'red';
 			$dt      = "points: { symbol: 'triangle', fillColor: '#AA4643' }, color: '#AA4643'}";
-			$t       = esc_html__( "همه فرم های سایت", 'gravityformspayping' );
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-					FROM " . GFPersian_DB_payping::get_entry_table_name() . " l
-					WHERE l.status='active' AND l.is_fulfilled=1
-					GROUP BY date(date)
-					ORDER BY payment_date DESC",
-					$tz_offset
-				)
+			$t       = esc_html__( "همه فرم های سایت", 'payping-gravityforms' );
+		
+			$query = $wpdb->prepare(
+				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
+				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				WHERE l.status = %s AND l.is_fulfilled = 1
+				GROUP BY DATE(l.payment_date)
+				ORDER BY l.payment_date DESC",
+				$tz_offset,
+				'active'
 			);
-			
-		}
+		
+			$results = $wpdb->get_results( $query );
+		}		
 
 		$sales_week   = 0;
 		$revenue_week = 0;
@@ -1108,9 +1127,9 @@ class GFPersian_Chart_payping {
 				$datat = isset( $datat ) ? $datat : '';
 				$data  .= "[{$timeX},{$datat}],";
 
-				$sales_line = "<div class='payping_tooltip_sales'><span class='payping_tooltip_heading'>" . esc_html__( "تعداد پرداخت ", "gravityformspayping" ) . ": </span><span class='payping_tooltip_value'>" . $result->new_sales . "</span></div>";
+				$sales_line = "<div class='payping_tooltip_sales'><span class='payping_tooltip_heading'>" . esc_html__( "تعداد پرداخت ", "payping-gravityforms" ) . ": </span><span class='payping_tooltip_value'>" . $result->new_sales . "</span></div>";
 
-				$tooltips .= "\"<div class='tooltipbox_" . $c . "'><div class='payping_tooltip_date'>" . $timeX_tooltips . "</div>{$sales_line}<div class='payping_tooltip_revenue'><span class='payping_tooltip_heading'>" . esc_html__( "پرداختی", "gravityformspayping" ) . ": </span><span class='payping_tooltip_value'>" . GFCommon::to_money( $result->amount_sold ) . "</span></div></div>\",";
+				$tooltips .= "\"<div class='tooltipbox_" . $c . "'><div class='payping_tooltip_date'>" . $timeX_tooltips . "</div>{$sales_line}<div class='payping_tooltip_revenue'><span class='payping_tooltip_heading'>" . esc_html__( "پرداختی", "payping-gravityforms" ) . ": </span><span class='payping_tooltip_value'>" . GFCommon::to_money( $result->amount_sold ) . "</span></div></div>\",";
 			}
 
 			$data     = substr( $data, 0, strlen( $data ) - 1 );
@@ -1126,15 +1145,15 @@ class GFPersian_Chart_payping {
 			}";
 		}
 
-		$sales_label = esc_html__( "تعداد پرداخت های  این هفته ", 'gravityformspayping' ) . $t;
+		$sales_label = esc_html__( "تعداد پرداخت های  این هفته ", 'payping-gravityforms' ) . $t;
 
 		$midt          = $sales_week / 7;
-		$midt          = ( $midt ? number_format( $midt, 3, '.', '' ) : 0 ) . esc_html__( " در روز", 'gravityformspayping' );
-		$midt_label    = esc_html__( "میانگین تعداد پرداخت های  این هفته ", 'gravityformspayping' ) . $t;
-		$mid           = GFCommon::to_money( $revenue_week / 7 ) . esc_html__( " در روز", 'gravityformspayping' );
-		$mid_label     = esc_html__( "میانگین پرداخت های این هفته ", 'gravityformspayping' ) . $t;
+		$midt          = ( $midt ? number_format( $midt, 3, '.', '' ) : 0 ) . esc_html__( " در روز", 'payping-gravityforms' );
+		$midt_label    = esc_html__( "میانگین تعداد پرداخت های  این هفته ", 'payping-gravityforms' ) . $t;
+		$mid           = GFCommon::to_money( $revenue_week / 7 ) . esc_html__( " در روز", 'payping-gravityforms' );
+		$mid_label     = esc_html__( "میانگین پرداخت های این هفته ", 'payping-gravityforms' ) . $t;
 		$revenue_week  = GFCommon::to_money( $revenue_week );
-		$revenue_label = esc_html__( "جمع پرداخت های  این هفته ", 'gravityformspayping' ) . $t;
+		$revenue_label = esc_html__( "جمع پرداخت های  این هفته ", 'payping-gravityforms' ) . $t;
 
 		return array(
 			"series"        => $series,
@@ -1165,72 +1184,78 @@ class GFPersian_Chart_payping {
 		if ( $chart == 1 ) {
 			$c       = 'blue';
 			$dt      = "points: { symbol: 'diamond', fillColor: '#058DC7' }, color: '#058DC7'}";
-			$t       = esc_html__( "پی‌پینگ این فرم", 'gravityformspayping' );
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-					FROM " . GFPersian_DB_payping::get_entry_table_name() . " l
-					WHERE form_id=%d AND l.status='active' AND l.is_fulfilled=1 AND l.payment_method='payping'
-					GROUP BY date(date)
-					ORDER BY payment_date DESC",
-					$tz_offset,
-					$form_id
-				)
+			$t       = esc_html__( "پی‌پینگ این فرم", 'payping-gravityforms' );
+		
+			$query = $wpdb->prepare(
+				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
+				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				WHERE form_id = %d AND l.status = %s AND l.is_fulfilled = 1 AND l.payment_method = %s
+				GROUP BY DATE(l.payment_date)
+				ORDER BY l.payment_date DESC",
+				$tz_offset,
+				$form_id,
+				'active',
+				'payping'
 			);
-			
+		
+			$results = $wpdb->get_results( $query );
 		}
-
+		
 		if ( $chart == 2 ) {
 			$c       = 'green';
 			$dt      = "points: { symbol: 'square', fillColor: '#50B432' }, color: '#50B432'}";
-			$t       = esc_html__( "همه روشهای این فرم", 'gravityformspayping' );
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-					FROM " . GFPersian_DB_payping::get_entry_table_name() . " l
-					WHERE form_id=%d AND l.status='active' AND l.is_fulfilled=1
-					GROUP BY date(date)
-					ORDER BY payment_date DESC",
-					$tz_offset,
-					$form_id
-				)
+			$t       = esc_html__( "همه روشهای این فرم", 'payping-gravityforms' );
+		
+			$query = $wpdb->prepare(
+				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
+				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				WHERE form_id = %d AND l.status = %s AND l.is_fulfilled = 1
+				GROUP BY DATE(l.payment_date)
+				ORDER BY l.payment_date DESC",
+				$tz_offset,
+				$form_id,
+				'active'
 			);
-			
+		
+			$results = $wpdb->get_results( $query );
 		}
-
+		
 		if ( $chart == 3 ) {
 			$c       = 'orang';
 			$dt      = "}";
-			$t       = esc_html__( "همه فرمهای پی‌پینگ", 'gravityformspayping' );
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-					FROM " . GFPersian_DB_payping::get_entry_table_name() . " l
-					WHERE l.status='active' AND l.is_fulfilled=1 AND l.payment_method='payping'
-					GROUP BY date(date)
-					ORDER BY payment_date DESC",
-					$tz_offset
-				)
+			$t       = esc_html__( "همه فرمهای پی‌پینگ", 'payping-gravityforms' );
+		
+			$query = $wpdb->prepare(
+				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
+				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				WHERE l.status = %s AND l.is_fulfilled = 1 AND l.payment_method = %s
+				GROUP BY DATE(l.payment_date)
+				ORDER BY l.payment_date DESC",
+				$tz_offset,
+				'active',
+				'payping'
 			);
-			
+		
+			$results = $wpdb->get_results( $query );
 		}
-
+		
 		if ( $chart == 4 ) {
 			$c       = 'red';
 			$dt      = "points: { symbol: 'triangle', fillColor: '#AA4643' }, color: '#AA4643'}";
-			$t       = esc_html__( "همه فرمهای پی‌پینگ", 'gravityformspayping' );
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-					FROM " . GFPersian_DB_payping::get_entry_table_name() . " l
-					WHERE l.status='active' AND l.is_fulfilled=1
-					GROUP BY date(date)
-					ORDER BY payment_date DESC",
-					$tz_offset
-				)
+			$t       = esc_html__( "همه فرمهای پی‌پینگ", 'payping-gravityforms' );
+		
+			$query = $wpdb->prepare(
+				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
+				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				WHERE l.status = %s AND l.is_fulfilled = 1
+				GROUP BY DATE(l.payment_date)
+				ORDER BY l.payment_date DESC",
+				$tz_offset,
+				'active'
 			);
-			
-		}
+		
+			$results = $wpdb->get_results( $query );
+		}		
 
 		$sales_thistday   = 0;
 		$revenue_thistday = 0;
@@ -1328,9 +1353,9 @@ class GFPersian_Chart_payping {
 				$datat = isset( $datat ) ? $datat : '';
 				$data  .= "[{$timeX},{$datat}],";
 
-				$sales_line = "<div class='payping_tooltip_sales'><span class='payping_tooltip_heading'>" . esc_html__( " تعداد پرداخت", "gravityformspayping" ) . ": </span><span class='payping_tooltip_value'>" . $result->new_sales . "</span></div>";
+				$sales_line = "<div class='payping_tooltip_sales'><span class='payping_tooltip_heading'>" . esc_html__( " تعداد پرداخت", "payping-gravityforms" ) . ": </span><span class='payping_tooltip_value'>" . $result->new_sales . "</span></div>";
 
-				$tooltips .= "\"<div class='tooltipbox_" . $c . "'><div class='payping_tooltip_date'>" . $timeX_tooltips . "</div>{$sales_line}<div class='payping_tooltip_revenue'><span class='payping_tooltip_heading'>" . esc_html__( "پرداختی", "gravityformspayping" ) . ": </span><span class='payping_tooltip_value'>" . GFCommon::to_money( $result->amount_sold ) . "</span></div></div>\",";
+				$tooltips .= "\"<div class='tooltipbox_" . $c . "'><div class='payping_tooltip_date'>" . $timeX_tooltips . "</div>{$sales_line}<div class='payping_tooltip_revenue'><span class='payping_tooltip_heading'>" . esc_html__( "پرداختی", "payping-gravityforms" ) . ": </span><span class='payping_tooltip_value'>" . GFCommon::to_money( $result->amount_sold ) . "</span></div></div>\",";
 			}
 
 			$data     = substr( $data, 0, strlen( $data ) - 1 );
@@ -1339,7 +1364,7 @@ class GFPersian_Chart_payping {
 
 			if ( $xmonth == 1 || $xmonth == 2 ) {
 				$n = GF_jdate( 'F', strtotime( $today ), '', date_default_timezone_get(), 'en' );
-				$n = $n . esc_html__( " ماه", "gravityformspayping" );
+				$n = $n . esc_html__( " ماه", "payping-gravityforms" );
 			}
 			if ( $xmonth == 60 || $xmonth == 3 || $xmonth == 6 || $xmonth == 9 || $xmonth == 12 ) {
 				$n = $xmonth;
@@ -1347,10 +1372,10 @@ class GFPersian_Chart_payping {
 				if ( $xmonth == 60 ) {
 					$n = 2;
 				}
-				$n = $n . esc_html__( " ماه اخیر", "gravityformspayping" );
+				$n = $n . esc_html__( " ماه اخیر", "payping-gravityforms" );
 
 				if ( $xmonth == 12 ) {
-					$n = esc_html__( " یکسال اخیر", "gravityformspayping" );
+					$n = esc_html__( " یکسال اخیر", "payping-gravityforms" );
 				}
 			}
 			if ( $xmonth == 1 || $xmonth == 2 || $xmonth == 60 ) {
@@ -1375,7 +1400,7 @@ class GFPersian_Chart_payping {
 
 		if ( $xmonth == 1 || $xmonth == 2 ) {
 			$n = GF_jdate( 'F', strtotime( $today ), '', date_default_timezone_get(), 'en' );
-			$n = $n . esc_html__( " ماه", 'gravityformspayping' );
+			$n = $n . esc_html__( " ماه", 'payping-gravityforms' );
 		}
 
 		if ( $xmonth == 60 || $xmonth == 3 || $xmonth == 6 || $xmonth == 9 || $xmonth == 12 ) {
@@ -1386,25 +1411,25 @@ class GFPersian_Chart_payping {
 				$n = 2;
 			}
 
-			$n = $n . esc_html__( ' ماه اخیر', 'gravityformspayping' );
+			$n = $n . esc_html__( ' ماه اخیر', 'payping-gravityforms' );
 
 			if ( $xmonth == 12 ) {
-				$n = esc_html__( 'یک سال اخیر', 'gravityformspayping' );
+				$n = esc_html__( 'یک سال اخیر', 'payping-gravityforms' );
 			}
 		}
 
-		$sales_label = esc_html__( 'تعداد پرداخت های  ', 'gravityformspayping' ) . $n . ' ' . $t;
+		$sales_label = esc_html__( 'تعداد پرداخت های  ', 'payping-gravityforms' ) . $n . ' ' . $t;
 
 		$strd             = date_create( $strd );
 		$endd             = date_create( $endd );
 		$diff             = date_diff( $strd, $endd );
 		$midd             = $diff->format( "%a" ) + 1;
 		$midt             = $midd ? $sales_thistday / $midd : 0;
-		$midt             = number_format( $midt, 3, '.', '' ) . esc_html__( " در روز", 'gravityformspayping' );
-		$midt_label       = esc_html__( 'میانگین تعداد پرداخت های ', 'gravityformspayping' ) . $n . ' ' . $t;
-		$mid              = ( $midd ? GFCommon::to_money( $revenue_thistday / $midd ) : 0 ) . esc_html__( " در روز", 'gravityformspayping' );
-		$mid_label        = esc_html__( 'میانگین پرداخت های ', 'gravityformspayping' ) . $n . ' ' . $t;
-		$revenue_label    = esc_html__( 'جمع پرداخت های  ', 'gravityformspayping' ) . $n . ' ' . $t;
+		$midt             = number_format( $midt, 3, '.', '' ) . esc_html__( " در روز", 'payping-gravityforms' );
+		$midt_label       = esc_html__( 'میانگین تعداد پرداخت های ', 'payping-gravityforms' ) . $n . ' ' . $t;
+		$mid              = ( $midd ? GFCommon::to_money( $revenue_thistday / $midd ) : 0 ) . esc_html__( " در روز", 'payping-gravityforms' );
+		$mid_label        = esc_html__( 'میانگین پرداخت های ', 'payping-gravityforms' ) . $n . ' ' . $t;
+		$revenue_label    = esc_html__( 'جمع پرداخت های  ', 'payping-gravityforms' ) . $n . ' ' . $t;
 		$revenue_thistday = GFCommon::to_money( $revenue_thistday );
 
 		return array(
@@ -1436,72 +1461,78 @@ class GFPersian_Chart_payping {
 		if ( $chart == 1 ) {
 			$c       = 'blue';
 			$dt      = "points: { symbol: 'diamond', fillColor: '#058DC7' }, color: '#058DC7'}";
-			$t       = esc_html__( "پی‌پینگ این فرم", 'gravityformspayping' );
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-					FROM " . GFPersian_DB_payping::get_entry_table_name() . " l
-					WHERE form_id=%d AND l.status='active' AND l.is_fulfilled=1 AND l.payment_method='payping'
-					GROUP BY hour(date), day(date)
-					ORDER BY payment_date DESC",
-					$tz_offset,
-					$form_id
-				)
+			$t       = esc_html__( "پی‌پینگ این فرم", 'payping-gravityforms' );
+		
+			$query = $wpdb->prepare(
+				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
+				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				WHERE form_id = %d AND l.status = %s AND l.is_fulfilled = 1 AND l.payment_method = %s
+				GROUP BY HOUR(date), DAY(date)
+				ORDER BY l.payment_date DESC",
+				$tz_offset,
+				$form_id,
+				'active',
+				'payping'
 			);
-			
+		
+			$results = $wpdb->get_results( $query );
 		}
-
+		
 		if ( $chart == 2 ) {
 			$c       = 'green';
 			$dt      = "points: { symbol: 'square', fillColor: '#50B432' }, color: '#50B432'}";
-			$t       = esc_html__( "همه روشهای این فرم", 'gravityformspayping' );
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-					FROM " . GFPersian_DB_payping::get_entry_table_name() . " l
-					WHERE form_id=%d AND l.status='active' AND l.is_fulfilled=1
-					GROUP BY hour(date), day(date)
-					ORDER BY payment_date DESC",
-					$tz_offset,
-					$form_id
-				)
+			$t       = esc_html__( "همه روشهای این فرم", 'payping-gravityforms' );
+		
+			$query = $wpdb->prepare(
+				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
+				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				WHERE form_id = %d AND l.status = %s AND l.is_fulfilled = 1
+				GROUP BY HOUR(date), DAY(date)
+				ORDER BY l.payment_date DESC",
+				$tz_offset,
+				$form_id,
+				'active'
 			);
-			
+		
+			$results = $wpdb->get_results( $query );
 		}
-
+		
 		if ( $chart == 3 ) {
 			$c       = 'orang';
 			$dt      = "color: '#EDC240'}";
-			$t       = esc_html__( "همه فرمهای پی‌پینگ", 'gravityformspayping' );
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-					FROM " . GFPersian_DB_payping::get_entry_table_name() . " l
-					WHERE l.status='active' AND l.is_fulfilled=1 AND l.payment_method='payping'
-					GROUP BY HOUR(date), DAY(date)
-					ORDER BY payment_date DESC",
-					$tz_offset
-				)
+			$t       = esc_html__( "همه فرمهای پی‌پینگ", 'payping-gravityforms' );
+		
+			$query = $wpdb->prepare(
+				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
+				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				WHERE l.status = %s AND l.is_fulfilled = 1 AND l.payment_method = %s
+				GROUP BY HOUR(date), DAY(date)
+				ORDER BY l.payment_date DESC",
+				$tz_offset,
+				'active',
+				'payping'
 			);
-			
+		
+			$results = $wpdb->get_results( $query );
 		}
-
+		
 		if ( $chart == 4 ) {
 			$c       = 'red';
 			$dt      = "points: { symbol: 'triangle', fillColor: '#AA4643' }, color: '#AA4643'}";
-			$t       = esc_html__( "همه فرم های سایت", 'gravityformspayping' );
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-					FROM " . GFPersian_DB_payping::get_entry_table_name() . " l
-					WHERE l.status='active' AND l.is_fulfilled=1
-					GROUP BY HOUR(date), DAY(date)
-					ORDER BY payment_date DESC",
-					$tz_offset
-				)
+			$t       = esc_html__( "همه فرم های سایت", 'payping-gravityforms' );
+		
+			$query = $wpdb->prepare(
+				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
+				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				WHERE l.status = %s AND l.is_fulfilled = 1
+				GROUP BY HOUR(date), DAY(date)
+				ORDER BY l.payment_date DESC",
+				$tz_offset,
+				'active'
 			);
-			
-		}
+		
+			$results = $wpdb->get_results( $query );
+		}		
 
 		$sales_today   = 0;
 		$revenue_today = 0;
@@ -1510,11 +1541,11 @@ class GFPersian_Chart_payping {
 		$today         = date( 'Y-m-d H:i:s', $tday );
 		$date          = new DateTime( $today );
 		if ( $day == 1 ) {
-			$n    = esc_html__( "امروز", 'gravityformspayping' );
+			$n    = esc_html__( "امروز", 'payping-gravityforms' );
 			$baze = date( 'm d , Y', $tday );
 			$ty   = date( 'Ymd', $tday );
 		} else if ( $day == 2 ) {
-			$n = esc_html__( "دیروز", 'gravityformspayping' );
+			$n = esc_html__( "دیروز", 'payping-gravityforms' );
 			$date->sub( new DateInterval( 'P1DT0H0M' ) );
 			$baze = $date->format( 'm d , Y' );
 			$ty   = $date->format( 'Ymd' );
@@ -1552,9 +1583,9 @@ class GFPersian_Chart_payping {
 
 				$data .= "[(new Date('$m $d , $y $H:00:30')).getTime(),{$datat}],";
 
-				$sales_line = "<div class='payping_tooltip_sales'><span class='payping_tooltip_heading'>" . esc_html__( "تعداد پرداخت ", "gravityformspayping" ) . ": </span><span class='payping_tooltip_value'>" . $result->new_sales . "</span></div>";
+				$sales_line = "<div class='payping_tooltip_sales'><span class='payping_tooltip_heading'>" . esc_html__( "تعداد پرداخت ", "payping-gravityforms" ) . ": </span><span class='payping_tooltip_value'>" . $result->new_sales . "</span></div>";
 
-				$tooltips .= "\"<div class='tooltipbox_" . $c . "'><div class='payping_tooltip_date'>" . $timeX_tooltips . "</div>{$sales_line}<div class='payping_tooltip_revenue'><span class='payping_tooltip_heading'>" . esc_html__( "پرداختی", "gravityformspayping" ) . ": </span><span class='payping_tooltip_value'>" . GFCommon::to_money( $result->amount_sold ) . "</span></div></div>\",";
+				$tooltips .= "\"<div class='tooltipbox_" . $c . "'><div class='payping_tooltip_date'>" . $timeX_tooltips . "</div>{$sales_line}<div class='payping_tooltip_revenue'><span class='payping_tooltip_heading'>" . esc_html__( "پرداختی", "payping-gravityforms" ) . ": </span><span class='payping_tooltip_value'>" . GFCommon::to_money( $result->amount_sold ) . "</span></div></div>\",";
 			}
 
 			$data     = substr( $data, 0, strlen( $data ) - 1 );
@@ -1571,15 +1602,15 @@ class GFPersian_Chart_payping {
 			}";
 		}
 
-		$sales_label = esc_html__( "تعداد پرداخت های ", "gravityformspayping" ) . $n . " " . $t;
+		$sales_label = esc_html__( "تعداد پرداخت های ", "payping-gravityforms" ) . $n . " " . $t;
 
 		$midt          = $sales_today / 24;
-		$midt          = number_format( $midt, 3, '.', '' ) . esc_html__( " در ساعت", "gravityformspayping" );
-		$midt_label    = esc_html__( "میانگین تعداد پرداخت های ", "gravityformspayping" ) . $n . " " . $t;
-		$mid           = GFCommon::to_money( $revenue_today / 24 ) . esc_html__( " در ساعت", "gravityformspayping" );
-		$mid_label     = esc_html__( "میانگین پرداخت های ", "gravityformspayping" ) . $n . " " . $t;
+		$midt          = number_format( $midt, 3, '.', '' ) . esc_html__( " در ساعت", "payping-gravityforms" );
+		$midt_label    = esc_html__( "میانگین تعداد پرداخت های ", "payping-gravityforms" ) . $n . " " . $t;
+		$mid           = GFCommon::to_money( $revenue_today / 24 ) . esc_html__( " در ساعت", "payping-gravityforms" );
+		$mid_label     = esc_html__( "میانگین پرداخت های ", "payping-gravityforms" ) . $n . " " . $t;
 		$revenue_today = GFCommon::to_money( $revenue_today );
-		$revenue_label = esc_html__( "جمع پرداخت های ", "gravityformspayping" ) . $n . " " . $t;
+		$revenue_label = esc_html__( "جمع پرداخت های ", "payping-gravityforms" ) . $n . " " . $t;
 
 		return array(
 			"series"        => $series,
@@ -1610,72 +1641,78 @@ class GFPersian_Chart_payping {
 		if ( $chart == 1 ) {
 			$c  = 'blue';
 			$dt = "points: { symbol: 'diamond', fillColor: '#058DC7' }, color: '#058DC7'}";
-			$t  = esc_html__( "پی‌پینگ این فرم", 'gravityformspayping' );
-
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-					FROM " . GFPersian_DB_payping::get_entry_table_name() . " l
-					WHERE form_id=%d AND l.status='active' AND l.is_fulfilled=1 AND l.payment_method='payping'
-					GROUP BY DATE(l.payment_date)
-					ORDER BY DATE(l.payment_date) DESC",
-					$tz_offset,
-					$form_id
-				)
+			$t  = esc_html__( "پی‌پینگ این فرم", 'payping-gravityforms' );
+		
+			$query = $wpdb->prepare(
+				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
+				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				WHERE form_id = %d AND l.status = %s AND l.is_fulfilled = 1 AND l.payment_method = %s
+				GROUP BY DATE(l.payment_date)
+				ORDER BY DATE(l.payment_date) DESC",
+				$tz_offset,
+				$form_id,
+				'active',
+				'payping'
 			);
-			
+		
+			$results = $wpdb->get_results( $query );
 		}
+		
 		if ( $chart == 2 ) {
 			$c       = 'green';
 			$dt      = "points: { symbol: 'square', fillColor: '#50B432' }, color: '#50B432'}";
-			$t       = esc_html__( "همه روشهای این فرم", 'gravityformspayping' );
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-					FROM " . GFPersian_DB_payping::get_entry_table_name() . " l
-					WHERE form_id=%d AND l.status='active' AND l.is_fulfilled=1
-					GROUP BY DATE(l.payment_date)
-					ORDER BY DATE(l.payment_date) DESC",
-					$tz_offset,
-					$form_id
-				)
+			$t       = esc_html__( "همه روشهای این فرم", 'payping-gravityforms' );
+		
+			$query = $wpdb->prepare(
+				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
+				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				WHERE form_id = %d AND l.status = %s AND l.is_fulfilled = 1
+				GROUP BY DATE(l.payment_date)
+				ORDER BY DATE(l.payment_date) DESC",
+				$tz_offset,
+				$form_id,
+				'active'
 			);
-			
+		
+			$results = $wpdb->get_results( $query );
 		}
-
+		
 		if ( $chart == 3 ) {
 			$c       = 'orang';
 			$dt      = "}";
-			$t       = esc_html__( "همه فرمهای پی‌پینگ", 'gravityformspayping' );
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-					FROM " . GFPersian_DB_payping::get_entry_table_name() . " l
-					WHERE l.status='active' AND l.is_fulfilled=1 AND l.payment_method='payping'
-					GROUP BY DATE(l.payment_date)
-					ORDER BY DATE(l.payment_date) DESC",
-					$tz_offset
-				)
+			$t       = esc_html__( "همه فرمهای پی‌پینگ", 'payping-gravityforms' );
+		
+			$query = $wpdb->prepare(
+				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
+				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				WHERE l.status = %s AND l.is_fulfilled = 1 AND l.payment_method = %s
+				GROUP BY DATE(l.payment_date)
+				ORDER BY DATE(l.payment_date) DESC",
+				$tz_offset,
+				'active',
+				'payping'
 			);
-			
+		
+			$results = $wpdb->get_results( $query );
 		}
-
+		
 		if ( $chart == 4 ) {
 			$c       = 'red';
 			$dt      = "points: { symbol: 'triangle', fillColor: '#AA4643' }, color: '#AA4643'}";
-			$t       = esc_html__( "همه فرمهای سایت", 'gravityformspayping' );
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-					FROM " . GFPersian_DB_payping::get_entry_table_name() . " l
-					WHERE l.status='active' AND l.is_fulfilled=1
-					GROUP BY DATE(l.payment_date)
-					ORDER BY DATE(l.payment_date) DESC",
-					$tz_offset
-				)
+			$t       = esc_html__( "همه فرمهای سایت", 'payping-gravityforms' );
+		
+			$query = $wpdb->prepare(
+				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
+				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				WHERE l.status = %s AND l.is_fulfilled = 1
+				GROUP BY DATE(l.payment_date)
+				ORDER BY DATE(l.payment_date) DESC",
+				$tz_offset,
+				'active'
 			);
-			
-		}
+		
+			$results = $wpdb->get_results( $query );
+		}		
 
 		$sales_yearly   = 0;
 		$revenue_yearly = 0;
@@ -1716,9 +1753,9 @@ class GFPersian_Chart_payping {
 				$datat = isset( $datat ) ? $datat : '';
 				$data  .= "[{$timeX},{$datat}],";
 
-				$sales_line = "<div class='payping_tooltip_sales'><span class='payping_tooltip_heading'>" . esc_html__( "تعداد پرداخت ", "gravityformspayping" ) . ": </span><span class='payping_tooltip_value'>" . $result->new_sales . "</span></div>";
+				$sales_line = "<div class='payping_tooltip_sales'><span class='payping_tooltip_heading'>" . esc_html__( "تعداد پرداخت ", "payping-gravityforms" ) . ": </span><span class='payping_tooltip_value'>" . $result->new_sales . "</span></div>";
 
-				$tooltips .= "\"<div class='tooltipbox_" . $c . "'><div class='payping_tooltip_date'>" . $timeX_tooltips . "</div>{$sales_line}<div class='payping_tooltip_revenue'><span class='payping_tooltip_heading'>" . esc_html__( "پرداختی", "gravityformspayping" ) . ": </span><span class='payping_tooltip_value'>" . GFCommon::to_money( $result->amount_sold ) . "</span></div></div>\",";
+				$tooltips .= "\"<div class='tooltipbox_" . $c . "'><div class='payping_tooltip_date'>" . $timeX_tooltips . "</div>{$sales_line}<div class='payping_tooltip_revenue'><span class='payping_tooltip_heading'>" . esc_html__( "پرداختی", "payping-gravityforms" ) . ": </span><span class='payping_tooltip_value'>" . GFCommon::to_money( $result->amount_sold ) . "</span></div></div>\",";
 			}
 			$data     = substr( $data, 0, strlen( $data ) - 1 );
 			$tooltips = substr( $tooltips, 0, strlen( $tooltips ) - 1 );
@@ -1733,19 +1770,19 @@ class GFPersian_Chart_payping {
 			}";
 		}
 
-		$sales_label = esc_html__( "تعداد پرداخت های امسال ", "gravityformspayping" ) . $t;
+		$sales_label = esc_html__( "تعداد پرداخت های امسال ", "payping-gravityforms" ) . $t;
 
 		$strd           = date_create( $strd );
 		$endd           = date_create( $endd );
 		$diff           = date_diff( $strd, $endd );
 		$midd           = $diff->format( "%a" ) + 1;
 		$midt           = $midd ? $sales_yearly / $midd : 0;
-		$midt           = number_format( $midt, 3, '.', '' ) . esc_html__( " در روز", "gravityformspayping" );
-		$midt_label     = esc_html__( "میانگین تعداد پرداخت های امسال ", "gravityformspayping" ) . $t;
-		$mid            = ( $midd ? GFCommon::to_money( $revenue_yearly / $midd ) : 0 ) . esc_html__( " در روز", "gravityformspayping" );
-		$mid_label      = esc_html__( "میانگین پرداخت های امسال ", "gravityformspayping" ) . $t;
+		$midt           = number_format( $midt, 3, '.', '' ) . esc_html__( " در روز", "payping-gravityforms" );
+		$midt_label     = esc_html__( "میانگین تعداد پرداخت های امسال ", "payping-gravityforms" ) . $t;
+		$mid            = ( $midd ? GFCommon::to_money( $revenue_yearly / $midd ) : 0 ) . esc_html__( " در روز", "payping-gravityforms" );
+		$mid_label      = esc_html__( "میانگین پرداخت های امسال ", "payping-gravityforms" ) . $t;
 		$revenue_yearly = GFCommon::to_money( $revenue_yearly );
-		$revenue_label  = esc_html__( "جمع پرداخت های امسال ", "gravityformspayping" ) . $t;
+		$revenue_label  = esc_html__( "جمع پرداخت های امسال ", "payping-gravityforms" ) . $t;
 
 		return array(
 			"series"        => $series,
@@ -1778,72 +1815,77 @@ class GFPersian_Chart_payping {
 		if ( $chart == 1 ) {
 			$c       = 'blue';
 			$dt      = "points: { symbol: 'diamond', fillColor: '#058DC7' }, color: '#058DC7'}";
-			$t       = esc_html__( "پی‌پینگ این فرم", 'gravityformspayping' );
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-					FROM " . GFPersian_DB_payping::get_entry_table_name() . " l
-					WHERE form_id=%d AND l.status='active' AND l.is_fulfilled=1 AND l.payment_method='payping'
-					GROUP BY DATE(l.payment_date)
-					ORDER BY DATE(l.payment_date) DESC",
-					$tz_offset,
-					$form_id
-				)
+			$t       = esc_html__( "پی‌پینگ این فرم", 'payping-gravityforms' );
+		
+			$query = $wpdb->prepare(
+				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
+				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				WHERE form_id = %d AND l.status = %s AND l.is_fulfilled = 1 AND l.payment_method = %s
+				GROUP BY DATE(l.payment_date)
+				ORDER BY DATE(l.payment_date) DESC",
+				$tz_offset,
+				$form_id,
+				'active',
+				'payping'
 			);
-			
-		}
+		
+			$results = $wpdb->get_results( $query );
+		}		
 
 		if ( $chart == 2 ) {
 			$c       = 'green';
 			$dt      = "points: { symbol: 'square', fillColor: '#50B432' }, color: '#50B432'}";
-			$t       = esc_html__( "همه روشهای این فرم", 'gravityformspayping' );
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-					FROM " . GFPersian_DB_payping::get_entry_table_name() . " l
-					WHERE form_id=%d AND l.status='active' AND l.is_fulfilled=1
-					GROUP BY DATE(l.payment_date)
-					ORDER BY DATE(l.payment_date) DESC",
-					$tz_offset,
-					$form_id
-				)
+			$t       = esc_html__( "همه روشهای این فرم", 'payping-gravityforms' );
+		
+			$query = $wpdb->prepare(
+				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
+				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				WHERE form_id = %d AND l.status = %s AND l.is_fulfilled = 1
+				GROUP BY DATE(l.payment_date)
+				ORDER BY DATE(l.payment_date) DESC",
+				$tz_offset,
+				$form_id,
+				'active'
 			);
-			
-		}
+		
+			$results = $wpdb->get_results( $query );
+		}		
 
 		if ( $chart == 3 ) {
 			$c       = 'orang';
 			$dt      = "}";
-			$t       = esc_html__( "همه فرمهای پی‌پینگ", 'gravityformspayping' );
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-					FROM " . GFPersian_DB_payping::get_entry_table_name() . " l
-					WHERE l.status='active' AND l.is_fulfilled=1 AND l.payment_method='payping'
-					GROUP BY DATE(l.payment_date)
-					ORDER BY DATE(l.payment_date) DESC",
-					$tz_offset
-				)
+			$t       = esc_html__( "همه فرمهای پی‌پینگ", 'payping-gravityforms' );
+		
+			$query = $wpdb->prepare(
+				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
+				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				WHERE l.status = %s AND l.is_fulfilled = 1 AND l.payment_method = %s
+				GROUP BY DATE(l.payment_date)
+				ORDER BY DATE(l.payment_date) DESC",
+				$tz_offset,
+				'active',
+				'payping'
 			);
-			
-		}
-
+		
+			$results = $wpdb->get_results( $query );
+		}		
 		if ( $chart == 4 ) {
 			$c       = 'red';
 			$dt      = "points: { symbol: 'triangle', fillColor: '#AA4643' }, color: '#AA4643'}";
-			$t       = esc_html__( "همه فرم های سایت", 'gravityformspayping' );
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-					FROM " . GFPersian_DB_payping::get_entry_table_name() . " l
-					WHERE l.status='active' AND l.is_fulfilled=1
-					GROUP BY DATE(l.payment_date)
-					ORDER BY DATE(l.payment_date) DESC",
-					$tz_offset
-				)
+			$t       = esc_html__( "همه فرم های سایت", 'payping-gravityforms' );
+		
+			$query = $wpdb->prepare(
+				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
+				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				WHERE l.status = %s AND l.is_fulfilled = 1
+				GROUP BY DATE(l.payment_date)
+				ORDER BY DATE(l.payment_date) DESC",
+				$tz_offset,
+				'active'
 			);
-			
-		}
+		
+			$results = $wpdb->get_results( $query );
+		}		
 
 		$sales_season   = 0;
 		$revenue_season = 0;
@@ -1867,7 +1909,7 @@ class GFPersian_Chart_payping {
 		$endd        = $akharesal_t;
 
 		if ( $season == 1 ) {
-			$n      = esc_html__( 'بهار', 'gravityformspayping' );
+			$n      = esc_html__( 'بهار', 'payping-gravityforms' );
 			$ebtda  = $avalesal_t;
 			$enteha = strtotime( $ebtda ) + ( 93 * 86400 ) - 86400;
 			$enteha = date( 'm d , Y', $enteha );
@@ -1876,7 +1918,7 @@ class GFPersian_Chart_payping {
 		}
 
 		if ( $season == 2 ) {
-			$n      = esc_html__( 'تابستان', 'gravityformspayping' );
+			$n      = esc_html__( 'تابستان', 'payping-gravityforms' );
 			$ebtda  = $avalesal_t;
 			$ebtda  = strtotime( $ebtda ) + ( 93 * 86400 );
 			$ebtda  = date( 'm d , Y', $ebtda );
@@ -1887,7 +1929,7 @@ class GFPersian_Chart_payping {
 		}
 
 		if ( $season == 3 ) {
-			$n      = esc_html__( 'پاییز', 'gravityformspayping' );
+			$n      = esc_html__( 'پاییز', 'payping-gravityforms' );
 			$ebtda  = $avalesal_t;
 			$ebtda  = strtotime( $ebtda ) + ( 186 * 86400 );
 			$ebtda  = date( 'm d , Y', $ebtda );
@@ -1898,7 +1940,7 @@ class GFPersian_Chart_payping {
 		}
 
 		if ( $season == 4 ) {
-			$n      = esc_html__( 'زمستان', 'gravityformspayping' );
+			$n      = esc_html__( 'زمستان', 'payping-gravityforms' );
 			$ebtda  = $avalesal_t;
 			$ebtda  = strtotime( $ebtda ) + ( 276 * 86400 );
 			$strd   = date( 'Y-m-d', $ebtda );
@@ -1929,9 +1971,9 @@ class GFPersian_Chart_payping {
 				$datat = isset( $datat ) ? $datat : '';
 				$data  .= "[{$timeX},{$datat}],";
 
-				$sales_line = "<div class='payping_tooltip_sales'><span class='payping_tooltip_heading'>" . esc_html__( "تعداد پرداخت ", "gravityformspayping" ) . ": </span><span class='payping_tooltip_value'>" . $result->new_sales . "</span></div>";
+				$sales_line = "<div class='payping_tooltip_sales'><span class='payping_tooltip_heading'>" . esc_html__( "تعداد پرداخت ", "payping-gravityforms" ) . ": </span><span class='payping_tooltip_value'>" . $result->new_sales . "</span></div>";
 
-				$tooltips .= "\"<div class='tooltipbox_" . $c . "'><div class='payping_tooltip_date'>" . $timeX_tooltips . "</div>{$sales_line}<div class='payping_tooltip_revenue'><span class='payping_tooltip_heading'>" . esc_html__( "پرداختی", "gravityformspayping" ) . ": </span><span class='payping_tooltip_value'>" . GFCommon::to_money( $result->amount_sold ) . "</span></div></div>\",";
+				$tooltips .= "\"<div class='tooltipbox_" . $c . "'><div class='payping_tooltip_date'>" . $timeX_tooltips . "</div>{$sales_line}<div class='payping_tooltip_revenue'><span class='payping_tooltip_heading'>" . esc_html__( "پرداختی", "payping-gravityforms" ) . ": </span><span class='payping_tooltip_value'>" . GFCommon::to_money( $result->amount_sold ) . "</span></div></div>\",";
 			}
 
 			$data     = substr( $data, 0, strlen( $data ) - 1 );
@@ -1948,14 +1990,14 @@ class GFPersian_Chart_payping {
 		}
 
 
-		$sales_label = esc_html__( "تعداد پرداخت های  ", 'gravityformspayping' ) . $n . " " . $t;
+		$sales_label = esc_html__( "تعداد پرداخت های  ", 'payping-gravityforms' ) . $n . " " . $t;
 
 		$midt           = $midt ? $sales_season / $midd : 0;
-		$midt           = ( $midt ? number_format( $midt, 3, '.', '' ) : 0 ) . esc_html__( " در روز", 'gravityformspayping' );
-		$midt_label     = esc_html__( "میانگین تعداد پرداخت های  ", 'gravityformspayping' ) . $n . " " . $t;
-		$mid            = ( $midd ? GFCommon::to_money( $revenue_season / $midd ) : 0 ) . esc_html__( " در روز", 'gravityformspayping' );
-		$mid_label      = esc_html__( "میانگین پرداخت های  ", 'gravityformspayping' ) . $n . " " . $t;
-		$revenue_label  = esc_html__( "جمع پرداخت های  ", 'gravityformspayping' ) . $n . " " . $t;
+		$midt           = ( $midt ? number_format( $midt, 3, '.', '' ) : 0 ) . esc_html__( " در روز", 'payping-gravityforms' );
+		$midt_label     = esc_html__( "میانگین تعداد پرداخت های  ", 'payping-gravityforms' ) . $n . " " . $t;
+		$mid            = ( $midd ? GFCommon::to_money( $revenue_season / $midd ) : 0 ) . esc_html__( " در روز", 'payping-gravityforms' );
+		$mid_label      = esc_html__( "میانگین پرداخت های  ", 'payping-gravityforms' ) . $n . " " . $t;
+		$revenue_label  = esc_html__( "جمع پرداخت های  ", 'payping-gravityforms' ) . $n . " " . $t;
 		$revenue_season = GFCommon::to_money( $revenue_season );
 
 		return array(
@@ -1990,77 +2032,91 @@ class GFPersian_Chart_payping {
 		if ( $chart == 1 ) {
 			$c       = 'blue';
 			$dt      = "points: { symbol: 'diamond', fillColor: '#058DC7' }, color: '#058DC7'}";
-			$t       = esc_html__( "پی‌پینگ این فرم", 'gravityformspayping' );
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-					FROM " . GFPersian_DB_payping::get_entry_table_name() . " l
-					WHERE form_id=%d AND l.status='active' AND l.is_fulfilled=1 AND l.payment_method='payping'
-					GROUP BY DATE(l.payment_date)
-					ORDER BY DATE(l.payment_date) DESC",
-					$tz_offset,
-					$form_id
-				)
+			$t       = esc_html__( "پی‌پینگ این فرم", 'payping-gravityforms' );
+		
+			$query = $wpdb->prepare(
+				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
+				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				WHERE form_id = %d AND l.status = %s AND l.is_fulfilled = 1 AND l.payment_method = %s
+				GROUP BY DATE(l.payment_date)
+				ORDER BY DATE(l.payment_date) DESC",
+				$tz_offset,
+				$form_id,
+				'active',
+				'payping'
 			);
-			
+		
+			$results = $wpdb->get_results( $query );
 		}
-
+		
 		if ( $chart == 2 ) {
 			$c       = 'green';
 			$dt      = "points: { symbol: 'square', fillColor: '#50B432' }, color: '#50B432'}";
-			$t       = esc_html__( "همه روشهای این فرم", 'gravityformspayping' );
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-					FROM " . GFPersian_DB_payping::get_entry_table_name() . " l
-					WHERE form_id=%d AND l.status='active' AND l.is_fulfilled=1
-					GROUP BY DATE(l.payment_date)
-					ORDER BY DATE(l.payment_date) DESC",
-					$tz_offset,
-					$form_id
-				)
+			$t       = esc_html__( "همه روشهای این فرم", 'payping-gravityforms' );
+		
+			$query = $wpdb->prepare(
+				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
+				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				WHERE form_id = %d AND l.status = %s AND l.is_fulfilled = 1
+				GROUP BY DATE(l.payment_date)
+				ORDER BY DATE(l.payment_date) DESC",
+				$tz_offset,
+				$form_id,
+				'active'
 			);
-			
+		
+			$results = $wpdb->get_results( $query );
 		}
-
+		
 		if ( $chart == 3 ) {
 			$c       = 'orang';
 			$dt      = "}";
-			$t       = esc_html__( "همه فرمهای پی‌پینگ", 'gravityformspayping' );
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-					FROM " . GFPersian_DB_payping::get_entry_table_name() . " l
-					WHERE l.status='active' AND l.is_fulfilled=1 AND l.payment_method='payping'
-					GROUP BY DATE(l.payment_date)
-					ORDER BY DATE(l.payment_date) DESC",
-					$tz_offset
-				)
+			$t       = esc_html__( "همه فرمهای پی‌پینگ", 'payping-gravityforms' );
+		
+			$query = $wpdb->prepare(
+				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
+				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				WHERE l.status = %s AND l.is_fulfilled = 1 AND l.payment_method = %s
+				GROUP BY DATE(l.payment_date)
+				ORDER BY DATE(l.payment_date) DESC",
+				$tz_offset,
+				'active',
+				'payping'
 			);
-			
+		
+			$results = $wpdb->get_results( $query );
 		}
-
+		
 		if ( $chart == 4 ) {
 			$c       = 'red';
 			$dt      = "points: { symbol: 'triangle', fillColor: '#AA4643' }, color: '#AA4643'}";
-			$t       = esc_html__( "همه فرمهای سایت", 'gravityformspayping' );
-			$results = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-					FROM " . GFPersian_DB_payping::get_entry_table_name() . " l
-					WHERE l.status='active' AND l.is_fulfilled=1
-					GROUP BY DATE(l.payment_date)
-					ORDER BY DATE(l.payment_date) DESC",
-					$tz_offset
-				)
+			$t       = esc_html__( "همه فرمهای سایت", 'payping-gravityforms' );
+		
+			$query = $wpdb->prepare(
+				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
+				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				WHERE l.status = %s AND l.is_fulfilled = 1
+				GROUP BY DATE(l.payment_date)
+				ORDER BY DATE(l.payment_date) DESC",
+				$tz_offset,
+				'active'
 			);
-			
-		}
+		
+			$results = $wpdb->get_results( $query );
+		}		
 
 		$sales_today   = 0;
 		$revenue_today = 0;
 		$tooltips      = "";
-		if ( ! empty( $results ) && isset( $_POST['submit'] ) && $max && $min ) {
+		
+		if ( 
+			! empty( $results ) && 
+			isset( $_POST['submit'] ) && 
+			$max && 
+			$min &&
+			isset( $_POST['gf_payping_chart'] ) && 
+			wp_verify_nonce( $_POST['gf_payping_chart'], 'search' )
+		) {
 			list( $y2, $m2, $d2 ) = explode( "-", $max );
 
 			if ( $y2 < 2000 ) {
@@ -2101,9 +2157,9 @@ class GFPersian_Chart_payping {
 				$datat = isset( $datat ) ? $datat : '';
 				$data  .= "[{$timeX},{$datat}],";
 
-				$sales_line = "<div class='payping_tooltip_sales'><span class='payping_tooltip_heading'>" . esc_html__( "تعداد پرداخت ", "gravityformspayping" ) . ": </span><span class='payping_tooltip_value'>" . $result->new_sales . "</span></div>";
+				$sales_line = "<div class='payping_tooltip_sales'><span class='payping_tooltip_heading'>" . esc_html__( "تعداد پرداخت ", "payping-gravityforms" ) . ": </span><span class='payping_tooltip_value'>" . $result->new_sales . "</span></div>";
 
-				$tooltips .= "\"<div class='tooltipbox_" . $c . "'><div class='payping_tooltip_date'>" . $timeX_tooltips . "</div>{$sales_line}<div class='payping_tooltip_revenue'><span class='payping_tooltip_heading'>" . esc_html__( "پرداختی", "gravityformspayping" ) . ": </span><span class='payping_tooltip_value'>" . GFCommon::to_money( $result->amount_sold ) . "</span></div></div>\",";
+				$tooltips .= "\"<div class='tooltipbox_" . $c . "'><div class='payping_tooltip_date'>" . $timeX_tooltips . "</div>{$sales_line}<div class='payping_tooltip_revenue'><span class='payping_tooltip_heading'>" . esc_html__( "پرداختی", "payping-gravityforms" ) . ": </span><span class='payping_tooltip_value'>" . GFCommon::to_money( $result->amount_sold ) . "</span></div></div>\",";
 			}
 
 			$data     = substr( $data, 0, strlen( $data ) - 1 );
@@ -2139,15 +2195,15 @@ class GFPersian_Chart_payping {
 			}";
 		}
 
-		$sales_label = esc_html__( "تعداد پرداخت های بازه انتخابی ", 'gravityformspayping' ) . $t;
+		$sales_label = esc_html__( "تعداد پرداخت های بازه انتخابی ", 'payping-gravityforms' ) . $t;
 
 		$midt          = $midd ? $sales_today / $midd : 0;
-		$midt          = number_format( $midt, 3, '.', '' ) . esc_html__( " در روز", 'gravityformspayping' );
-		$midt_label    = esc_html__( "میانگین تعداد پرداخت های  ", 'gravityformspayping' ) . $t . "";
-		$mid           = ( $midd ? GFCommon::to_money( $revenue_today / $midd ) : 0 ) . esc_html__( " در روز", 'gravityformspayping' );
-		$mid_label     = esc_html__( "میانگین پرداخت های  ", 'gravityformspayping' ) . $t . "";
+		$midt          = number_format( $midt, 3, '.', '' ) . esc_html__( " در روز", 'payping-gravityforms' );
+		$midt_label    = esc_html__( "میانگین تعداد پرداخت های  ", 'payping-gravityforms' ) . $t . "";
+		$mid           = ( $midd ? GFCommon::to_money( $revenue_today / $midd ) : 0 ) . esc_html__( " در روز", 'payping-gravityforms' );
+		$mid_label     = esc_html__( "میانگین پرداخت های  ", 'payping-gravityforms' ) . $t . "";
 		$revenue_today = GFCommon::to_money( $revenue_today );
-		$revenue_label = esc_html__( "جمع پرداخت های بازه انتخابی ", 'gravityformspayping' ) . $t;
+		$revenue_label = esc_html__( "جمع پرداخت های بازه انتخابی ", 'payping-gravityforms' ) . $t;
 
 		return array(
 			"series"        => $series,
