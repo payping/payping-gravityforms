@@ -51,7 +51,7 @@ class GFPersian_Gateway_payping {
 
 			if ( rgget( "page" ) == "gf_settings" ) {
 				RGForms::add_settings_page( array(
-						'name'      => 'gf_payping',
+						'name'      => 'gravityforms_payping',
 						'tab_label' => esc_html__( 'درگاه پی‌پینگ', 'payping-gravityforms' ),
 						'title'     => esc_html__( 'تنظیمات درگاه پی‌پینگ', 'payping-gravityforms' ),
 						'handler'   => array( __CLASS__, 'settings_page' ),
@@ -88,14 +88,15 @@ class GFPersian_Gateway_payping {
 	public static function admin_notice_persian_gf() {
 		$class_safe   = 'notice notice-error';
 		$message_safe = sprintf( esc_html__( "برای استفاده از نسخه جدید درگاه های پرداخت گرویتی فرم نصب بسته فارسی ساز نسخه 2.3.1 به بالا الزامی است. برای نصب فارسی ساز %sکلیک کنید%s.", "payping-gravityforms" ), '<a href="' . admin_url( "plugin-install.php?tab=plugin-information&plugin=persian-gravity-forms&TB_iframe=true&width=772&height=884" ) . '">', '</a>' );
-		printf( '<div class="%1$s"><p>%2$s</p></div>', $class_safe , $message_safe );
+		printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class_safe ), esc_html( $message_safe ) );
 	}
 
 	// -------------------------------------------------
 	public static function admin_notice_gf_support() {
 		$class_safe   = 'notice notice-error';
 		$message_safe = sprintf( esc_html__( "درگاه پی‌پینگ نیاز به گرویتی فرم نسخه %s به بالا دارد. برای بروز رسانی هسته گرویتی فرم به %sسایت گرویتی فرم فارسی%s مراجعه نمایید .", "payping-gravityforms" ), self::$min_gravityforms_version, "<a href='http:///11378' target='_blank'>", "</a>" );
-		printf( '<div class="%1$s"><p>%2$s</p></div>', $class_safe, $message_safe );
+		printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class_safe ), esc_html( $message_safe ) );
+
 	}
 
 
@@ -152,7 +153,7 @@ class GFPersian_Gateway_payping {
 		$permission = "gravityforms_payping";
 		if ( ! empty( $permission ) ) {
 			$menus[] = array(
-				"name"       => "gf_payping",
+				"name"       => "gravityforms_payping",
 				"label"      => esc_html__( "پی‌پینگ", "payping-gravityforms" ),
 				"callback"   => array( __CLASS__, "payping_page" ),
 				"permission" => $permission
@@ -222,14 +223,14 @@ class GFPersian_Gateway_payping {
 		delete_option( "gf_payping_version" );
 		$plugin = basename( dirname( __FILE__ ) ) . "/index.php";
 		deactivate_plugins( $plugin );
-		update_option( 'recently_activated', array( $plugin => time() ) + (array) get_option( 'recently_activated' ) );
+		update_option( 'payping_gf_recently_activated', array( $plugin => time() ) + (array) get_option( 'payping_gf_recently_activated' ) );
 	}
 
 	// -------------------------------------------------
 	private static function is_payping_page() {
-		$current_page    = in_array( trim( strtolower( rgget( "page" ) ) ), array( 'gf_payping', 'payping' ) );
-		$current_view    = in_array( trim( strtolower( rgget( "view" ) ) ), array( 'gf_payping', 'payping' ) );
-		$current_subview = in_array( trim( strtolower( rgget( "subview" ) ) ), array( 'gf_payping', 'payping' ) );
+		$current_page    = in_array( trim( strtolower( rgget( "page" ) ) ), array( 'gravityforms_payping', 'payping' ) );
+		$current_view    = in_array( trim( strtolower( rgget( "view" ) ) ), array( 'gravityforms_payping', 'payping' ) );
+		$current_subview = in_array( trim( strtolower( rgget( "subview" ) ) ), array( 'gravityforms_payping', 'payping' ) );
 
 		return $current_page || $current_view || $current_subview;
 	}
@@ -240,9 +241,9 @@ class GFPersian_Gateway_payping {
         <h3>
 			<span><i class="fa fa-credit-card"></i> <?php esc_html_e( 'پی‌پینگ', 'payping-gravityforms' ) ?>
                 <a id="add-new-confirmation" class="add-new-h2"
-                   href="<?php echo esc_url( admin_url( 'admin.php?page=gf_payping&view=edit&fid=' . absint( rgget( "id" ) ) ) ) ?>"><?php esc_html_e( 'افزودن فید جدید', 'payping-gravityforms' ) ?></a></span>
+                   href="<?php echo esc_url( admin_url( 'admin.php?page=gravityforms_payping&view=edit&fid=' . absint( rgget( "id" ) ) ) ) ?>"><?php esc_html_e( 'افزودن فید جدید', 'payping-gravityforms' ) ?></a></span>
             <a class="add-new-h2"
-               href="admin.php?page=gf_payping&view=stats&id=<?php echo absint( rgget( 'id' ) ); ?>"><?php esc_html_e( "نمودار ها", "payping-gravityforms" ) ?></a>
+               href="admin.php?page=gravityforms_payping&view=stats&id=<?php echo absint( rgget( 'id' ) ); ?>"><?php esc_html_e( "نمودار ها", "payping-gravityforms" ) ?></a>
         </h3>
 		<?php self::list_page( 'per-form' ); ?>
 		<?php GFFormSettings::page_footer();
@@ -373,17 +374,31 @@ class GFPersian_Gateway_payping {
 	private static function redirect_confirmation( $url, $ajax ) {
 
 		if ( headers_sent() || $ajax ) {
-			$confirmation = "<script type=\"text/javascript\">" . apply_filters( 'gform_cdata_open', '' ) . " function gformRedirect(){document.location.href='$url';}";
+			// Enqueue the custom JavaScript inline
+			wp_enqueue_script( 'custom-redirect', '', array( 'jquery' ), '1.0.0', true );
+	
+			$confirmation = "<script type=\"text/javascript\">" . apply_filters( 'gform_cdata_open', '' ) . "
+				jQuery(document).ready(function($) {
+					function gformRedirect(url) {
+						document.location.href = url;
+					}
+					
+					gformRedirect('$url');
+				});
+			";
+			
 			if ( ! $ajax ) {
 				$confirmation .= 'gformRedirect();';
 			}
+	
 			$confirmation .= apply_filters( 'gform_cdata_close', '' ) . '</script>';
 		} else {
 			$confirmation = array( 'redirect' => $url );
 		}
-
+	
 		return $confirmation;
 	}
+	
 
 	// -------------------------------------------------
 	public static function get_active_config( $form ) {
@@ -463,7 +478,7 @@ class GFPersian_Gateway_payping {
 					<?php esc_html_e( "فیدهای درگاه پی‌پینگ", "payping-gravityforms" );
 					if ( get_option( "gf_payping_configured" ) ) { ?>
                         <a class="add-new-h2"
-                           href="admin.php?page=gf_payping&view=edit"><?php esc_html_e( "افزودن جدید", "payping-gravityforms" ) ?></a>
+                           href="admin.php?page=gravityforms_payping&view=edit"><?php esc_html_e( "افزودن جدید", "payping-gravityforms" ) ?></a>
 						<?php
 					} ?>
                 </h2>
@@ -486,7 +501,7 @@ class GFPersian_Gateway_payping {
 						echo '<input type="submit" class="button" value="' . esc_html__( "اعمال", "payping-gravityforms" ) . '" onclick="if( jQuery(\'#bulk_action\').val() == \'delete\' && !confirm(\'' . esc_html__( "فید حذف شود ؟ ", "payping-gravityforms" ) . esc_html__( "\'Cancel\' برای منصرف شدن, \'OK\' برای حذف کردن", "payping-gravityforms" ) . '\')) { return false; } return true;"/>';
 						?>
                         <a class="button button-primary"
-                           href="admin.php?page=gf_settings&subview=gf_payping"><?php esc_html_e( 'تنظیمات حساب پی‌پینگ', 'payping-gravityforms' ) ?></a>
+                           href="admin.php?page=gf_settings&subview=gravityforms_payping"><?php esc_html_e( 'تنظیمات حساب پی‌پینگ', 'payping-gravityforms' ) ?></a>
                     </div>
                 </div>
                 <table class="wp-list-table widefat fixed striped toplevel_page_gf_edit_forms" cellspacing="0">
@@ -531,7 +546,7 @@ class GFPersian_Gateway_payping {
 						?>
                         <tr>
                             <td colspan="5" style="padding:20px;">
-								<?php echo sprintf( esc_html__( "برای شروع باید درگاه را فعال نمایید . به %sتنظیمات پی‌پینگ%s بروید . ", "payping-gravityforms" ), '<a href="admin.php?page=gf_settings&subview=gf_payping">', "</a>" ); ?>
+								<?php echo sprintf( esc_html__( "برای شروع باید درگاه را فعال نمایید . به %sتنظیمات پی‌پینگ%s بروید . ", "payping-gravityforms" ), '<a href="admin.php?page=gf_settings&subview=gravityforms_payping">', "</a>" ); ?>
                             </td>
                         </tr>
 						<?php
@@ -554,7 +569,7 @@ class GFPersian_Gateway_payping {
                                         <div class="row-actions">
                                                 <span class="edit">
                                                     <a title="<?php esc_html_e( "ویرایش فید", "payping-gravityforms" ) ?>"
-                                                       href="admin.php?page=gf_payping&view=edit&id=<?php echo esc_html($setting["id"]) ?>"><?php esc_html_e( "ویرایش فید", "payping-gravityforms" ) ?></a>
+                                                       href="admin.php?page=gravityforms_payping&view=edit&id=<?php echo esc_html($setting["id"]) ?>"><?php esc_html_e( "ویرایش فید", "payping-gravityforms" ) ?></a>
                                                     |
                                                 </span>
                                             <span class="trash">
@@ -568,13 +583,13 @@ class GFPersian_Gateway_payping {
 								<?php if ( $arg != 'per-form' ) { ?>
                                     <td class="column-title">
                                         <strong><a class="row-title"
-                                                   href="admin.php?page=gf_payping&view=edit&id=<?php echo esc_html($setting["id"]) ?>"
+                                                   href="admin.php?page=gravityforms_payping&view=edit&id=<?php echo esc_html($setting["id"]) ?>"
                                                    title="<?php esc_html_e( "تنظیم مجدد درگاه", "payping-gravityforms" ) ?>"><?php echo esc_html($setting["form_title"]) ?></a></strong>
 
                                         <div class="row-actions">
                                             <span class="edit">
                                                 <a title="<?php esc_html_e( "ویرایش فید", "payping-gravityforms" ) ?>"
-                                                   href="admin.php?page=gf_payping&view=edit&id=<?php echo esc_html($setting["id"]) ?>"><?php esc_html_e( "ویرایش فید", "payping-gravityforms" ) ?></a>
+                                                   href="admin.php?page=gravityforms_payping&view=edit&id=<?php echo esc_html($setting["id"]) ?>"><?php esc_html_e( "ویرایش فید", "payping-gravityforms" ) ?></a>
                                                 |
                                             </span>
                                             <span class="trash">
@@ -594,7 +609,7 @@ class GFPersian_Gateway_payping {
                                             </span>
                                             <span class="view">
                                                 <a title="<?php esc_html_e( "نمودارهای فرم", "payping-gravityforms" ) ?>"
-                                                   href="admin.php?page=gf_payping&view=stats&id=<?php echo esc_html($setting["form_id"]) ?>"><?php esc_html_e( "نمودارهای فرم", "payping-gravityforms" ) ?></a>
+                                                   href="admin.php?page=gravityforms_payping&view=stats&id=<?php echo esc_html($setting["form_id"]) ?>"><?php esc_html_e( "نمودارهای فرم", "payping-gravityforms" ) ?></a>
                                             </span>
                                         </div>
                                     </td>
@@ -619,9 +634,9 @@ class GFPersian_Gateway_payping {
                             <td colspan="5" style="padding:20px;">
 								<?php
 								if ( $arg == 'per-form' ) {
-									echo sprintf( esc_html__( "شما هیچ فید پی‌پینگی ندارید . %sیکی بسازید%s .", "payping-gravityforms" ), '<a href="admin.php?page=gf_payping&view=edit&fid=' . absint( rgget( "id" ) ) . '">', "</a>" );
+									echo sprintf( esc_html__( "شما هیچ فید پی‌پینگی ندارید . %sیکی بسازید%s .", "payping-gravityforms" ), '<a href="admin.php?page=gravityforms_payping&view=edit&fid=' . absint( rgget( "id" ) ) . '">', "</a>" );
 								} else {
-									echo sprintf( esc_html__( "شما هیچ فید پی‌پینگی ندارید . %sیکی بسازید%s .", "payping-gravityforms" ), '<a href="admin.php?page=gf_payping&view=edit">', "</a>" );
+									echo sprintf( esc_html__( "شما هیچ فید پی‌پینگی ندارید . %sیکی بسازید%s .", "payping-gravityforms" ), '<a href="admin.php?page=gravityforms_payping&view=edit">', "</a>" );
 								}
 								?>
                             </td>
@@ -633,47 +648,58 @@ class GFPersian_Gateway_payping {
                 </table>
             </form>
         </div>
-        <script type="text/javascript">
-            function DeleteSetting(id) {
-                jQuery("#action_argument").val(id);
-                jQuery("#action").val("delete");
-                jQuery("#confirmation_list_form")[0].submit();
-            }
+        <?php
+			wp_enqueue_script( 'toggle-script', '', array( 'jquery' ), '1.0.0', true );
+		?>
 
-            function ToggleActive(img, feed_id) {
-                var is_active = img.src.indexOf("active1.png") >= 0;
-                if (is_active) {
-                    img.src = img.src.replace("active1.png", "active0.png");
-                    jQuery(img).attr('title', '<?php esc_html_e( "درگاه غیر فعال است", "payping-gravityforms" ) ?>').attr('alt', '<?php esc_html_e( "درگاه غیر فعال است", "payping-gravityforms" ) ?>');
-                }
-                else {
-                    img.src = img.src.replace("active0.png", "active1.png");
-                    jQuery(img).attr('title', '<?php esc_html_e( "درگاه فعال است", "payping-gravityforms" ) ?>').attr('alt', '<?php esc_html_e( "درگاه فعال است", "payping-gravityforms" ) ?>');
-                }
-                var mysack = new sack(ajaxurl);
-                mysack.execute = 1;
-                mysack.method = 'POST';
-                mysack.setVar("action", "gf_payping_update_feed_active");
-                mysack.setVar("gf_payping_update_feed_active", "<?php echo wp_create_nonce( "gf_payping_update_feed_active" ) ?>");
-                mysack.setVar("feed_id", feed_id);
-                mysack.setVar("is_active", is_active ? 0 : 1);
-                mysack.onError = function () {
-                    alert('<?php esc_html_e( "خطای Ajax رخ داده است", "payping-gravityforms" ) ?>')
-                };
-                mysack.runAJAX();
-                return true;
-            }
-        </script>
+		<script type="text/javascript">
+			function DeleteSetting(id) {
+				jQuery("#action_argument").val(id);
+				jQuery("#action").val("delete");
+				jQuery("#confirmation_list_form")[0].submit();
+			}
+
+			function ToggleActive(img, feed_id) {
+				var is_active = img.src.indexOf("active1.png") >= 0;
+				if (is_active) {
+					img.src = img.src.replace("active1.png", "active0.png");
+					jQuery(img).attr('title', '<?php esc_html_e( "درگاه غیر فعال است", "payping-gravityforms" ) ?>').attr('alt', '<?php esc_html_e( "درگاه غیر فعال است", "payping-gravityforms" ) ?>');
+				}
+				else {
+					img.src = img.src.replace("active0.png", "active1.png");
+					jQuery(img).attr('title', '<?php esc_html_e( "درگاه فعال است", "payping-gravityforms" ) ?>').attr('alt', '<?php esc_html_e( "درگاه فعال است", "payping-gravityforms" ) ?>');
+				}
+				var mysack = new sack(ajaxurl);
+				mysack.execute = 1;
+				mysack.method = 'POST';
+				mysack.setVar("action", "gf_payping_update_feed_active");
+				mysack.setVar("gf_payping_update_feed_active", "<?php echo wp_create_nonce( "gf_payping_update_feed_active" ) ?>");
+				mysack.setVar("feed_id", feed_id);
+				mysack.setVar("is_active", is_active ? 0 : 1);
+				mysack.onError = function () {
+					alert('<?php esc_html_e( "خطای Ajax رخ داده است", "payping-gravityforms" ) ?>')
+				};
+				mysack.runAJAX();
+				return true;
+			}
+		</script>
 		<?php
 	}
 
 	// -------------------------------------------------
 	public static function update_feed_active() {
 		check_ajax_referer( 'gf_payping_update_feed_active', 'gf_payping_update_feed_active' );
-		$id   = absint( rgpost( 'feed_id' ) );
+	
+		$id   = absint( rgpost( 'feed_id' ) ); // Sanitize as an integer
 		$feed = GFPersian_DB_payping::get_feed( $id );
-		GFPersian_DB_payping::update_feed( $id, $feed["form_id"], $_POST["is_active"], $feed["meta"] );
+	
+		$form_id = intval( $feed["form_id"] ); // Sanitize as an integer
+		$is_active = isset( $_POST["is_active"] ) ? intval( $_POST["is_active"] ) : 0; // Sanitize as an integer, default to 0 if not set
+		$meta = esc_sql( $feed["meta"] ); // Escape SQL data
+	
+		GFPersian_DB_payping::update_feed( $id, $form_id, $is_active, $meta );
 	}
+	
 
 	// -------------------------------------------------
 	private static function Return_URL( $form_id, $entry_id ) {
@@ -923,7 +949,7 @@ class GFPersian_Gateway_payping {
 				echo esc_html__( 'درگاه پرداخت : پی‌پینگ (غیر قابل ویرایش)', 'payping-gravityforms' );
 			}
 
-			echo '<br/>';
+			echo esc_html('<br/>');
 		}
 	}
 
@@ -1073,7 +1099,7 @@ class GFPersian_Gateway_payping {
 			} else {
 				echo '<div class="updated fade" style="padding:6px">' . esc_html__( "تنظیمات ذخیره شدند .", "payping-gravityforms" ) . '</div>';
 			}
-		} else if ( isset( $_GET['subview'] ) && $_GET['subview'] == 'gf_payping' && isset( $_GET['updated'] ) ) {
+		} else if ( isset( $_GET['subview'] ) && $_GET['subview'] == 'gravityforms_payping' && isset( $_GET['updated'] ) ) {
 			echo '<div class="updated fade" style="padding:6px">' . esc_html__( "تنظیمات ذخیره شدند .", "payping-gravityforms" ) . '</div>';
 		}
 		?>
@@ -1250,7 +1276,7 @@ class GFPersian_Gateway_payping {
 				<?php } ?>
 
             </h2>
-            <a class="button add-new-h2" href="admin.php?page=gf_settings&subview=gf_payping"
+            <a class="button add-new-h2" href="admin.php?page=gf_settings&subview=gravityforms_payping"
                style="margin:8px 9px;"><?php esc_html_e( "تنظیمات حساب پی‌پینگ", "payping-gravityforms" ) ?></a>
 
 			<?php
@@ -1292,16 +1318,24 @@ class GFPersian_Gateway_payping {
 				$config = apply_filters( self::$author . '_gform_payping_save_config', $config );
 
 				$id = GFPersian_DB_payping::update_feed( $id, $config["form_id"], $config["is_active"], $config["meta"] );
-				if ( ! headers_sent() ) {
-					wp_redirect( admin_url( 'admin.php?page=gf_payping&view=edit&id=' . $id . '&updated=true' ) );
+
+				$redirect_url = esc_url(admin_url('admin.php?page=gravityforms_payping&view=edit&id=' . $id . '&updated=true'));
+				if (!headers_sent()) {
+					wp_redirect($redirect_url);
 					exit;
 				} else {
-					echo "<script type='text/javascript'>window.onload = function () { top.location.href = '" . admin_url( 'admin.php?page=gf_payping&view=edit&id=' . $id . '&updated=true' ) . "'; };</script>";
+					$inline_script = "
+						window.onload = function() {
+							top.location.href = '{$redirect_url}';
+						};
+					";
+
+					wp_add_inline_script('custom-script', $inline_script);
 					exit;
 				}
 				?>
                 <div class="updated fade"
-                     style="padding:6px"><?php echo sprintf( esc_html__( "فید به روز شد . %sبازگشت به لیست%s.", "payping-gravityforms" ), "<a href='?page=gf_payping'>", "</a>" ) ?></div>
+                     style="padding:6px"><?php echo sprintf( esc_html__( "فید به روز شد . %sبازگشت به لیست%s.", "payping-gravityforms" ), "<a href='?page=gravityforms_payping'>", "</a>" ) ?></div>
 				<?php
 			}
 
@@ -1318,7 +1352,7 @@ class GFPersian_Gateway_payping {
 				$id = absint( $id ); ?>
 
                 <div class="updated fade"
-                     style="padding:6px"><?php echo sprintf( esc_html__( "فید به روز شد . %sبازگشت به لیست%s . ", "payping-gravityforms" ), "<a href='?page=gf_payping'>", "</a>" ) ?></div>
+                     style="padding:6px"><?php echo sprintf( esc_html__( "فید به روز شد . %sبازگشت به لیست%s . ", "payping-gravityforms" ), "<a href='?page=gravityforms_payping'>", "</a>" ) ?></div>
 
 				<?php
 			}
@@ -1420,13 +1454,13 @@ class GFPersian_Gateway_payping {
 								<?php wp_nonce_field( "update", "gf_payping_feed" ) ?>
 
 
-                                <input type="hidden" name="payping_setting_id" value="<?php echo $id ?>"/>
+                                <input type="hidden" name="payping_setting_id" value="<?php echo esc_attr($id); ?>"/>
                                 <table class="form-table gforms_form_settings" cellspacing="0" cellpadding="0">
                                     <tbody>
 
                                     <tr style="<?php echo rgget( 'id' ) || rgget( 'fid' ) ? 'display:none !important' : ''; ?>">
                                         <th>
-											<?php esc_html_e( "انتخاب فرم", "gravityformspayping" ); ?>
+											<?php esc_html_e( "انتخاب فرم", "payping-gravityforms" ); ?>
                                         </th>
                                         <td>
                                             <select id="gf_payping_form" name="gf_payping_form"
@@ -1497,7 +1531,8 @@ class GFPersian_Gateway_payping {
                                             <td class="payping_customer_fields_desc">
 												<?php
 												if ( ! empty( $form ) ) {
-													echo self::get_customer_information_desc( $form, $config );
+													$options_safe = self::get_customer_information_desc( $form, $config );
+													echo $options_safe;
 												}
 												?>
                                             </td>
@@ -1510,7 +1545,8 @@ class GFPersian_Gateway_payping {
                                             <td class="payping_customer_fields_email">
 												<?php
 												if ( ! empty( $form ) ) {
-													echo self::get_customer_information_email( $form, $config );
+													$options_safe = self::get_customer_information_email( $form, $config );
+													echo $options_safe;
 												}
 												?>
                                             </td>
@@ -1523,7 +1559,8 @@ class GFPersian_Gateway_payping {
                                             <td class="payping_customer_fields_mobile">
 												<?php
 												if ( ! empty( $form ) ) {
-													echo self::get_customer_information_mobile( $form, $config );
+													$options_safe = self::get_customer_information_mobile( $form, $config );
+													echo $options_safe;
 												}
 												?>
                                             </td>
@@ -1644,17 +1681,17 @@ class GFPersian_Gateway_payping {
 																foreach ( $condition_field_ids as $i => $value ):?>
 
                                                                     <div class="gf_payping_conditional_div"
-                                                                         id="gf_payping_<?php echo $i; ?>__conditional_div">
+                                                                         id="gf_payping_<?php echo intval( $i ); ?>__conditional_div">
 
                                                                         <select class="gf_payping_conditional_field_id"
-                                                                                id="gf_payping_<?php echo $i; ?>__conditional_field_id"
-                                                                                name="gf_payping_conditional_field_id[<?php echo $i; ?>]"
+                                                                                id="gf_payping_<?php echo intval( $i ); ?>__conditional_field_id"
+                                                                                name="gf_payping_conditional_field_id[<?php echo intval( $i ); ?>]"
                                                                                 title="">
                                                                         </select>
 
                                                                         <select class="gf_payping_conditional_operator"
-                                                                                id="gf_payping_<?php echo $i; ?>__conditional_operator"
-                                                                                name="gf_payping_conditional_operator[<?php echo $i; ?>]"
+                                                                                id="gf_payping_<?php echo intval( $i ); ?>__conditional_operator"
+                                                                                name="gf_payping_conditional_operator[<?php echo intval( $i ); ?>]"
                                                                                 style="font-family:tahoma,serif !important"
                                                                                 title="">
                                                                             <option value="is"><?php esc_html_e( "هست", "payping-gravityforms" ) ?></option>
@@ -1666,7 +1703,7 @@ class GFPersian_Gateway_payping {
                                                                             <option value="ends_with"><?php esc_html_e( "تمام میشود با", "payping-gravityforms" ) ?></option>
                                                                         </select>
 
-                                                                        <div id="gf_payping_<?php echo $i; ?>__conditional_value_container"
+                                                                        <div id="gf_payping_<?php echo intval( $i ); ?>__conditional_value_container"
                                                                              style="display:inline;">
                                                                         </div>
 
@@ -1683,7 +1720,7 @@ class GFPersian_Gateway_payping {
 																<?php endforeach; ?>
 
                                                                 <input type="hidden"
-                                                                       value="<?php echo key( array_slice( $condition_field_ids, - 1, 1, true ) ); ?>"
+                                                                       value="<?php echo intval( key( array_slice( $condition_field_ids, -1, 1, true ) ) ); ?>"
                                                                        id="gf_payping_conditional_counter">
 
                                                                 <div id="gf_no_conditional_message"
@@ -1744,200 +1781,196 @@ class GFPersian_Gateway_payping {
                 margin: 3px;
             }
         </style>
-        <script type="text/javascript">
-            function GF_SwitchFid(fid) {
-                jQuery("#payping_wait").show();
-                document.location = "?page=gf_payping&view=edit&fid=" + fid;
-            }
+		
+        <?php
+		function enqueue_my_custom_script() {
+			?>
+			<script type="text/javascript">
+				function GF_SwitchFid(fid) {
+					jQuery("#payping_wait").show();
+					document.location = "?page=gravityforms_payping&view=edit&fid=" + fid;
+				}
 
-            function GF_SwitchForm(id) {
-                if (id.length > 0) {
-                    document.location = "?page=gf_payping&view=edit&id=" + id;
-                }
-            }
+				function GF_SwitchForm(id) {
+					if (id.length > 0) {
+						document.location = "?page=gravityforms_payping&view=edit&id=" + id;
+					}
+				}
 
-            var form = [];
-            form = <?php echo ! empty( $form ) ? GFCommon::json_encode( $form ) : GFCommon::json_encode( array() ) ?>;
+				var form = [];
+				form = <?php echo ! empty( $form ) ? GFCommon::json_encode( $form ) : GFCommon::json_encode( array() ) ?>;
 
-            jQuery(document).ready(function ($) {
+				jQuery(document).ready(function ($) {
 
-                var delete_link, selectedField, selectedValue, selectedOperator;
+					var delete_link, selectedField, selectedValue, selectedOperator;
 
-                delete_link = $('.delete_this_condition');
-                if (delete_link.length === 1)
-                    delete_link.hide();
+					delete_link = $('.delete_this_condition');
+					if (delete_link.length === 1)
+						delete_link.hide();
 
-                $(document.body).on('change', '.gf_payping_conditional_field_id', function () {
-                    var id = $(this).attr('id');
-                    id = id.replace('gf_payping_', '').replace('__conditional_field_id', '');
-                    var selectedOperator = $('#gf_payping_' + id + '__conditional_operator').val();
-                    $('#gf_payping_' + id + '__conditional_value_container').html(GetConditionalFieldValues("gf_payping_" + id + "__conditional", jQuery(this).val(), selectedOperator, "", 20, id));
-                }).on('change', '.gf_payping_conditional_operator', function () {
-                    var id = $(this).attr('id');
-                    id = id.replace('gf_payping_', '').replace('__conditional_operator', '');
-                    var selectedOperator = $(this).val();
-                    var field_id = $('#gf_payping_' + id + '__conditional_field_id').val();
-                    $('#gf_payping_' + id + '__conditional_value_container').html(GetConditionalFieldValues("gf_payping_" + id + "__conditional", field_id, selectedOperator, "", 20, id));
-                }).on('click', '.add_new_condition', function () {
-                    var parent_div = $(this).parent('.gf_payping_conditional_div');
-                    var counter = $('#gf_payping_conditional_counter');
-                    var new_id = parseInt(counter.val()) + 1;
-                    var content = parent_div[0].outerHTML
-                        .replace(new RegExp('gf_payping_\\d+__', 'g'), ('gf_payping_' + new_id + '__'))
-                        .replace(new RegExp('\\[\\d+\\]', 'g'), ('[' + new_id + ']'));
-                    counter.val(new_id);
-                    counter.before(content);
-                    //parent_div.after(content);
-                    RefreshConditionRow("gf_payping_" + new_id + "__conditional", "", "is", "", new_id);
-                    $('.delete_this_condition').show();
-                    return false;
-                }).on('click', '.delete_this_condition', function () {
-                    $(this).parent('.gf_payping_conditional_div').remove();
-                    var delete_link = $('.delete_this_condition');
-                    if (delete_link.length === 1)
-                        delete_link.hide();
-                    return false;
-                });
+					$(document.body).on('change', '.gf_payping_conditional_field_id', function () {
+						var id = $(this).attr('id');
+						id = id.replace('gf_payping_', '').replace('__conditional_field_id', '');
+						var selectedOperator = $('#gf_payping_' + id + '__conditional_operator').val();
+						$('#gf_payping_' + id + '__conditional_value_container').html(GetConditionalFieldValues("gf_payping_" + id + "__conditional", jQuery(this).val(), selectedOperator, "", 20, id));
+					}).on('change', '.gf_payping_conditional_operator', function () {
+						var id = $(this).attr('id');
+						id = id.replace('gf_payping_', '').replace('__conditional_operator', '');
+						var selectedOperator = $(this).val();
+						var field_id = $('#gf_payping_' + id + '__conditional_field_id').val();
+						$('#gf_payping_' + id + '__conditional_value_container').html(GetConditionalFieldValues("gf_payping_" + id + "__conditional", field_id, selectedOperator, "", 20, id));
+					}).on('click', '.add_new_condition', function () {
+						var parent_div = $(this).parent('.gf_payping_conditional_div');
+						var counter = $('#gf_payping_conditional_counter');
+						var new_id = parseInt(counter.val()) + 1;
+						var content = parent_div[0].outerHTML
+							.replace(new RegExp('gf_payping_\\d+__', 'g'), ('gf_payping_' + new_id + '__'))
+							.replace(new RegExp('\\[\\d+\\]', 'g'), ('[' + new_id + ']'));
+						counter.val(new_id);
+						counter.before(content);
+						RefreshConditionRow("gf_payping_" + new_id + "__conditional", "", "is", "", new_id);
+						$('.delete_this_condition').show();
+						return false;
+					}).on('click', '.delete_this_condition', function () {
+						$(this).parent('.gf_payping_conditional_div').remove();
+						var delete_link = $('.delete_this_condition');
+						if (delete_link.length === 1)
+							delete_link.hide();
+						return false;
+					});
 
-				<?php foreach ( $condition_field_ids as $i => $field_id ) : ?>
-                selectedField = "<?php echo str_replace( '"', '\"', $field_id )?>";
-                selectedValue = "<?php echo str_replace( '"', '\"', $condition_values[ '' . $i . '' ] )?>";
-                selectedOperator = "<?php echo str_replace( '"', '\"', $condition_operators[ '' . $i . '' ] )?>";
-                RefreshConditionRow("gf_payping_<?php echo $i;?>__conditional", selectedField, selectedOperator, selectedValue, <?php echo $i;?>);
-				<?php endforeach;?>
-            });
+					<?php foreach ( $condition_field_ids as $i => $field_id ) : ?>
+					selectedField = "<?php echo str_replace( '"', '\"', $field_id )?>";
+					selectedValue = "<?php echo str_replace( '"', '\"', $condition_values[ '' . $i . '' ] )?>";
+					selectedOperator = "<?php echo str_replace( '"', '\"', $condition_operators[ '' . $i . '' ] )?>";
+					RefreshConditionRow("gf_payping_<?php echo intval( $i );?>__conditional", selectedField, selectedOperator, selectedValue, <?php echo intval( $i );?>);
+					<?php endforeach;?>
+				});
 
-            function RefreshConditionRow(input, selectedField, selectedOperator, selectedValue, index) {
-                var field_id = jQuery("#" + input + "_field_id");
-                field_id.html(GetSelectableFields(selectedField, 20));
-                var optinConditionField = field_id.val();
-                var checked = jQuery("#" + input + "_enabled").attr('checked');
-                if (optinConditionField) {
-                    jQuery("#gf_no_conditional_message").hide();
-                    jQuery("#" + input + "_div").show();
-                    jQuery("#" + input + "_value_container").html(GetConditionalFieldValues("" + input + "", optinConditionField, selectedOperator, selectedValue, 20, index));
-                    jQuery("#" + input + "_value").val(selectedValue);
-                    jQuery("#" + input + "_operator").val(selectedOperator);
-                }
-                else {
-                    jQuery("#gf_no_conditional_message").show();
-                    jQuery("#" + input + "_div").hide();
-                }
-                if (!checked) jQuery("#" + input + "_container").hide();
-            }
+				function RefreshConditionRow(input, selectedField, selectedOperator, selectedValue, index) {
+					var field_id = jQuery("#" + input + "_field_id");
+					field_id.html(GetSelectableFields(selectedField, 20));
+					var optinConditionField = field_id.val();
+					var checked = jQuery("#" + input + "_enabled").attr('checked');
+					if (optinConditionField) {
+						jQuery("#gf_no_conditional_message").hide();
+						jQuery("#" + input + "_div").show();
+						jQuery("#" + input + "_value_container").html(GetConditionalFieldValues("" + input + "", optinConditionField, selectedOperator, selectedValue, 20, index));
+						jQuery("#" + input + "_value").val(selectedValue);
+						jQuery("#" + input + "_operator").val(selectedOperator);
+					}
+					else {
+						jQuery("#gf_no_conditional_message").show();
+						jQuery("#" + input + "_div").hide();
+					}
+					if (!checked) jQuery("#" + input + "_container").hide();
+				}
 
-            /**
-             * @return {string}
-             */
-            function GetConditionalFieldValues(input, fieldId, selectedOperator, selectedValue, labelMaxCharacters, index) {
-                if (!fieldId)
-                    return "";
-                var str = "";
-                var name = (input.replace(new RegExp('_\\d+__', 'g'), '_')) + "_value[" + index + "]";
-                var field = GetFieldById(fieldId);
-                if (!field)
-                    return "";
+				function GetConditionalFieldValues(input, fieldId, selectedOperator, selectedValue, labelMaxCharacters, index) {
+					if (!fieldId)
+						return "";
+					var str = "";
+					var name = (input.replace(new RegExp('_\\d+__', 'g'), '_')) + "_value[" + index + "]";
+					var field = GetFieldById(fieldId);
+					if (!field)
+						return "";
 
-                var is_text = false;
+					var is_text = false;
 
-                if (selectedOperator == '' || selectedOperator == 'is' || selectedOperator == 'isnot') {
-                    if (field["type"] == "post_category" && field["displayAllCategories"]) {
-                        str += '<?php $dd = wp_dropdown_categories( array(
-							"class"        => "condition_field_value",
-							"orderby"      => "name",
-							"id"           => "gf_dropdown_cat_id",
-							"name"         => "gf_dropdown_cat_name",
-							"hierarchical" => true,
-							"hide_empty"   => 0,
-							"echo"         => false
-						) ); echo str_replace( "\n", "", str_replace( "'", "\\'", $dd ) ); ?>';
-                        str = str.replace("gf_dropdown_cat_id", "" + input + "_value").replace("gf_dropdown_cat_name", name);
-                    }
-                    else if (field.choices) {
-                        var isAnySelected = false;
-                        str += "<select class='condition_field_value' id='" + input + "_value' name='" + name + "'>";
-                        for (var i = 0; i < field.choices.length; i++) {
-                            var fieldValue = field.choices[i].value ? field.choices[i].value : field.choices[i].text;
-                            var isSelected = fieldValue == selectedValue;
-                            var selected = isSelected ? "selected='selected'" : "";
-                            if (isSelected)
-                                isAnySelected = true;
-                            str += "<option value='" + fieldValue.replace(/'/g, "&#039;") + "' " + selected + ">" + TruncateMiddle(field.choices[i].text, labelMaxCharacters) + "</option>";
-                        }
-                        if (!isAnySelected && selectedValue) {
-                            str += "<option value='" + selectedValue.replace(/'/g, "&#039;") + "' selected='selected'>" + TruncateMiddle(selectedValue, labelMaxCharacters) + "</option>";
-                        }
-                        str += "</select>";
-                    }
-                    else {
-                        is_text = true;
-                    }
-                }
-                else {
-                    is_text = true;
-                }
+					if (selectedOperator == '' || selectedOperator == 'is' || selectedOperator == 'isnot') {
+						if (field["type"] == "post_category" && field["displayAllCategories"]) {
+							str += '<?php $dd = wp_dropdown_categories( array(
+								"class"        => "condition_field_value",
+								"orderby"      => "name",
+								"id"           => "gf_dropdown_cat_id",
+								"name"         => "gf_dropdown_cat_name",
+								"hierarchical" => true,
+								"hide_empty"   => 0,
+								"echo"         => false
+							) ); echo str_replace( "\n", "", str_replace( "'", "\\'", $dd ) ); ?>';
+							str = str.replace("gf_dropdown_cat_id", "" + input + "_value").replace("gf_dropdown_cat_name", name);
+						}
+						else if (field.choices) {
+							var isAnySelected = false;
+							str += "<select class='condition_field_value' id='" + input + "_value' name='" + name + "'>";
+							for (var i = 0; i < field.choices.length; i++) {
+								var fieldValue = field.choices[i].value ? field.choices[i].value : field.choices[i].text;
+								var isSelected = fieldValue == selectedValue;
+								var selected = isSelected ? "selected='selected'" : "";
+								if (isSelected)
+									isAnySelected = true;
+								str += "<option value='" + fieldValue.replace(/'/g, "&#039;") + "' " + selected + ">" + TruncateMiddle(field.choices[i].text, labelMaxCharacters) + "</option>";
+							}
+							if (!isAnySelected && selectedValue) {
+								str += "<option value='" + selectedValue.replace(/'/g, "&#039;") + "' selected='selected'>" + TruncateMiddle(selectedValue, labelMaxCharacters) + "</option>";
+							}
+							str += "</select>";
+						}
+						else {
+							is_text = true;
+						}
+					}
+					else {
+						is_text = true;
+					}
 
-                if (is_text) {
-                    selectedValue = selectedValue ? selectedValue.replace(/'/g, "&#039;") : "";
-                    str += "<input type='text' class='condition_field_value' style='padding:3px' placeholder='<?php _e( "یک مقدار وارد نمایید", "gravityformspayping" ); ?>' id='" + input + "_value' name='" + name + "' value='" + selectedValue + "'>";
-                }
-                return str;
-            }
+					if (is_text) {
+						selectedValue = selectedValue ? selectedValue.replace(/'/g, "&#039;") : "";
+						str += "<input type='text' class='condition_field_value' style='padding:3px' placeholder='<?php esc_html_e( "یک مقدار وارد نمایید", "payping-gravityforms" ); ?>' id='" + input + "_value' name='" + name + "' value='" + selectedValue + "'>";
+					}
+					return str;
+				}
 
-            /**
-             * @return {string}
-             */
-            function GetSelectableFields(selectedFieldId, labelMaxCharacters) {
-                var str = "";
-                if (typeof form.fields !== "undefined") {
-                    var inputType;
-                    var fieldLabel;
-                    for (var i = 0; i < form.fields.length; i++) {
-                        fieldLabel = form.fields[i].adminLabel ? form.fields[i].adminLabel : form.fields[i].label;
-                        inputType = form.fields[i].inputType ? form.fields[i].inputType : form.fields[i].type;
-                        if (IsConditionalLogicField(form.fields[i])) {
-                            var selected = form.fields[i].id == selectedFieldId ? "selected='selected'" : "";
-                            str += "<option value='" + form.fields[i].id + "' " + selected + ">" + TruncateMiddle(fieldLabel, labelMaxCharacters) + "</option>";
-                        }
-                    }
-                }
-                return str;
-            }
+				function GetSelectableFields(selectedFieldId, labelMaxCharacters) {
+					var str = "";
+					if (typeof form.fields !== "undefined") {
+						var inputType;
+						var fieldLabel;
+						for (var i = 0; i < form.fields.length; i++) {
+							fieldLabel = form.fields[i].adminLabel ? form.fields[i].adminLabel : form.fields[i].label;
+							inputType = form.fields[i].inputType ? form.fields[i].inputType : form.fields[i].type;
+							if (IsConditionalLogicField(form.fields[i])) {
+								var selected = form.fields[i].id == selectedFieldId ? "selected='selected'" : "";
+								str += "<option value='" + form.fields[i].id + "' " + selected + ">" + TruncateMiddle(fieldLabel, labelMaxCharacters) + "</option>";
+							}
+						}
+					}
+					return str;
+				}
 
-            /**
-             * @return {string}
-             */
-            function TruncateMiddle(text, maxCharacters) {
-                if (!text)
-                    return "";
-                if (text.length <= maxCharacters)
-                    return text;
-                var middle = parseInt(maxCharacters / 2);
-                return text.substr(0, middle) + "..." + text.substr(text.length - middle, middle);
-            }
+				function TruncateMiddle(text, maxCharacters) {
+					if (!text)
+						return "";
+					if (text.length <= maxCharacters)
+						return text;
+					var middle = parseInt(maxCharacters / 2);
+					return text.substr(0, middle) + "..." + text.substr(text.length - middle, middle);
+				}
 
-            /**
-             * @return {object}
-             */
-            function GetFieldById(fieldId) {
-                for (var i = 0; i < form.fields.length; i++) {
-                    if (form.fields[i].id == fieldId)
-                        return form.fields[i];
-                }
-                return null;
-            }
+				function GetFieldById(fieldId) {
+					for (var i = 0; i < form.fields.length; i++) {
+						if (form.fields[i].id == fieldId)
+							return form.fields[i];
+					}
+					return null;
+				}
 
-            /**
-             * @return {boolean}
-             */
-            function IsConditionalLogicField(field) {
-                var inputType = field.inputType ? field.inputType : field.type;
-                var supported_fields = ["checkbox", "radio", "select", "text", "website", "textarea", "email", "hidden", "number", "phone", "multiselect", "post_title",
-                    "post_tags", "post_custom_field", "post_content", "post_excerpt"];
-                var index = jQuery.inArray(inputType, supported_fields);
-                return index >= 0;
-            }
-        </script>
+				function IsConditionalLogicField(field) {
+					var inputType = field.inputType ? field.inputType : field.type;
+					var supported_fields = ["checkbox", "radio", "select", "text", "website", "textarea", "email", "hidden", "number", "phone", "multiselect", "post_title",
+						"post_tags", "post_custom_field", "post_content", "post_excerpt"];
+					var index = jQuery.inArray(inputType, supported_fields);
+					return index >= 0;
+				}
+			</script>
+		<?php
+		}
+
+		// Enqueue the script
+		wp_enqueue_script('my-custom-script', '', array('jquery'), null, true);
+		wp_add_inline_script('my-custom-script', 'jQuery(document).ready(function($) { ' . enqueue_my_custom_script() . ' });');
+		?>
+
 		<?php
 	}
 

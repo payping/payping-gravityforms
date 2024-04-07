@@ -124,18 +124,24 @@ class GFPersian_Chart_payping {
 			);
 		}
 		add_action('admin_enqueue_scripts', 'enqueue_custom_admin_script');
-		?>
-        <script type="text/javascript">
-            var dp = jQuery.noConflict();
-            dp(document).ready(function () {
-                jQuery('.datepicker').datepicker({
-                    dateFormat: 'yy-mm-dd',
-                    showButtonPanel: true,
-                    changeMonth: true,
-                    changeYear: true
-                });
-            });
-        </script>
+		
+        function enqueue_datepicker_script() {
+			?>
+			<script type="text/javascript">
+				var dp = jQuery.noConflict();
+				dp(document).ready(function () {
+					jQuery('.datepicker').datepicker({
+						dateFormat: 'yy-mm-dd',
+						showButtonPanel: true,
+						changeMonth: true,
+						changeYear: true
+					});
+				});
+			</script>
+			<?php
+		}
+		wp_add_inline_script('jquery-ui-datepicker', 'jQuery(document).ready(function($) { ' . enqueue_datepicker_script() . ' });');
+		?>		
         <div class="wrap">
             <ul class="subsubsub">
                 <li><a class="<?php echo ( ! rgget( "tab" ) || rgget( "tab" ) == "today" ) ? "current" : "" ?>"
@@ -579,139 +585,144 @@ class GFPersian_Chart_payping {
                 </div>
             </div>
         </div>
-
-        <script type="text/javascript">
-
-            function startShowTooltip(item, graph) {
-                if (item) {
-                    if (!previousPoint || previousPoint[0] != item.datapoint[0]) {
-                        previousPoint = item.datapoint;
-                        jQuery("#payping_graph_tooltip").remove();
-                        var x = item.datapoint[0].toFixed(2),
-                            y = item.datapoint[1].toFixed(2);
-                        showTooltip(item.pageX, item.pageY, graph[item.dataIndex]);
-                    }
-                }
-                else {
-                    jQuery("#payping_graph_tooltip").remove();
-                    previousPoint = null;
-                }
-            }
-
-			<?php if (! empty( $chart_info["series"] )) :?>
-            var payping_graph_tooltips = <?php echo esc_html(GF_tr_num( $chart_info["tooltips"], 'fa' )); ?>;
-            jQuery.plot(jQuery("#graph_placeholder"), [<?php echo esc_html($chart_info["series"]); ?>], <?php echo esc_html($chart_info["options"]); ?>);
-            jQuery(window).resize(function () {
-                jQuery.plot(jQuery("#graph_placeholder"), [<?php echo esc_html($chart_info["series"]); ?>], <?php echo esc_html($chart_info["options"]); ?>);
-            });
-            var previousPoint = null;
-            jQuery("#graph_placeholder").bind("plothover", function (event, pos, item) {
-                startShowTooltip(item, payping_graph_tooltips);
-            });
-			<?php endif;?>
-
-
-			<?php if (! empty( $chart_info_hannan["series"] )) :?>
-            var payping_graph_tooltip1s1 = <?php echo esc_html(GF_tr_num( $chart_info_hannan["tooltips"], 'fa' )); ?>;
-            jQuery.plot(jQuery("#graph_placeholder1"), [<?php echo esc_html($chart_info_hannan["series"]); ?>], <?php echo esc_html($chart_info["options"]); ?>);
-            jQuery(window).resize(function () {
-                jQuery.plot(jQuery("#graph_placeholder1"), [<?php echo esc_html($chart_info_hannan["series"]); ?>], <?php echo esc_html($chart_info["options"]); ?>);
-            });
-            var previousPoint = null;
-            jQuery("#graph_placeholder1").bind("plothover", function (event, pos, item) {
-                startShowTooltip(item, payping_graph_tooltip1s1);
-            });
-			<?php endif;?>
-
-
-			<?php if (! empty( $chart_info_gateways["series"] )) :?>
-            var payping_graph_tooltip2s2 = <?php echo esc_html(GF_tr_num( $chart_info_gateways["tooltips"], 'fa' )); ?>;
-            jQuery.plot(jQuery("#graph_placeholder2"), [<?php echo esc_html($chart_info_gateways["series"]); ?>], <?php echo esc_html($chart_info["options"]); ?>);
-            jQuery(window).resize(function () {
-                jQuery.plot(jQuery("#graph_placeholder2"), [<?php echo esc_html($chart_info_gateways["series"]); ?>], <?php echo esc_html($chart_info["options"]); ?>);
-            });
-            var previousPoint = null;
-            jQuery("#graph_placeholder2").bind("plothover", function (event, pos, item) {
-                startShowTooltip(item, payping_graph_tooltip2s2);
-            });
-			<?php endif;?>
-
-
-			<?php if (! empty( $chart_info_site["series"] )) :?>
-            var payping_graph_tooltip3s3 = <?php echo esc_html(GF_tr_num( $chart_info_site["tooltips"], 'fa' )); ?>;
-            jQuery.plot(jQuery("#graph_placeholder3"), [<?php echo esc_html($chart_info_site["series"]); ?>], <?php echo esc_html($chart_info["options"]); ?>);
-            jQuery(window).resize(function () {
-                jQuery.plot(jQuery("#graph_placeholder3"), [<?php echo esc_html($chart_info_site["series"]) ?>], <?php echo esc_html($chart_info["options"]); ?>);
-            });
-            var previousPoint = null;
-            jQuery("#graph_placeholder3").bind("plothover", function (event, pos, item) {
-                startShowTooltip(item, payping_graph_tooltip3s3);
-            });
-			<?php endif;?>
-
-            function showTooltip(x, y, contents) {
-                jQuery('<div id="payping_graph_tooltip">' + contents + '<div class="tooltip_tip1"></div></div>').css({
-                    position: 'absolute',
-                    display: 'none',
-                    opacity: 1,
-                    width: '150px',
-                    height: '60px',
-                    top: y - 89,
-                    left: x - 79
-                }).appendTo("body").fadeIn(200);
-            }
-
-            function convertToMoney(number) {
-                var currency = getCurrentCurrency();
-                return currency.toMoney(number);
-            }
-
-            function getCurrentCurrency() {
-				<?php if ( ! class_exists( "RGCurrency" ) ) {
-				require_once( ABSPATH . "/" . WP_PLUGIN_DIR . "/gravityforms/currency.php" );
-			}
-				$current_currency = RGCurrency::get_currency( GFCommon::get_currency() );
-				?>
-                var currency = new Currency(<?php echo esc_html(GFCommon::json_encode( $current_currency )); ?>);
-                return currency;
-            }
-
-            function weekday(val, axis) {
-                var g_y = new Date(val).getFullYear();
-                var g_m = new Date(val).getMonth() + 1;
-                var g_d = new Date(val).getDate();
-                shamsi = gregorian_to_jalali(g_y, g_m, g_d);
-                sh_month = ["-", "فروردین", "اردیبهشت", "خرداد", "تير", "مرداد", "شهريور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
-                week = ["يكشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه", "شنبه"];
-                week = week[new Date(val).getDay()];
-                return week + ' - ' + shamsi[2] + ' ' + sh_month[shamsi[1]] + ' ' + shamsi[0];
-            }
-
-            function shamsi_1(val, axis) {
-                var g_y = new Date(val).getFullYear();
-                var g_m = new Date(val).getMonth() + 1;
-                var g_d = new Date(val).getDate();
-                shamsi = gregorian_to_jalali(g_y, g_m, g_d);
-                sh_month = ["-", "فروردین", "اردیبهشت", "خرداد", "تير", "مرداد", "شهريور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
-                return shamsi[2] + ' ' + sh_month[shamsi[1]] + ' ' + shamsi[0];
-            }
-
-            function shamsi_2(val, axis) {
-                var g_y = new Date(val).getFullYear();
-                var g_m = new Date(val).getMonth() + 1;
-                var g_d = new Date(val).getDate();
-                shamsi = gregorian_to_jalali(g_y, g_m, g_d);
-                sh_month = ["-", "فروردین", "اردیبهشت", "خرداد", "تير", "مرداد", "شهريور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
-                H = new Date(val).getHours();
-                H = (H < 10) ? "0" + H : H;
-                i = new Date(val).getMinutes();
-                i = (i < 10) ? "0" + i : i;
-                s = new Date(val).getSeconds();
-                s = (s < 10) ? "0" + s : s;
-                return ' ساعت ' + H;
-            }
-        </script>
 		<?php
+		function enqueue_graph_scripts() {
+			?>
+			<script type="text/javascript">
+				function startShowTooltip(item, graph) {
+					if (item) {
+						if (!previousPoint || previousPoint[0] != item.datapoint[0]) {
+							previousPoint = item.datapoint;
+							jQuery("#payping_graph_tooltip").remove();
+							var x = item.datapoint[0].toFixed(2),
+								y = item.datapoint[1].toFixed(2);
+							showTooltip(item.pageX, item.pageY, graph[item.dataIndex]);
+						}
+					}
+					else {
+						jQuery("#payping_graph_tooltip").remove();
+						previousPoint = null;
+					}
+				}
+		
+				<?php if (! empty( $chart_info["series"] )) :?>
+				var payping_graph_tooltips = <?php echo esc_html(GF_tr_num( $chart_info["tooltips"], 'fa' )); ?>;
+				jQuery.plot(jQuery("#graph_placeholder"), [<?php echo esc_html($chart_info["series"]); ?>], <?php echo esc_html($chart_info["options"]); ?>);
+				jQuery(window).resize(function () {
+					jQuery.plot(jQuery("#graph_placeholder"), [<?php echo esc_html($chart_info["series"]); ?>], <?php echo esc_html($chart_info["options"]); ?>);
+				});
+				var previousPoint = null;
+				jQuery("#graph_placeholder").bind("plothover", function (event, pos, item) {
+					startShowTooltip(item, payping_graph_tooltips);
+				});
+				<?php endif;?>
+		
+		
+				<?php if (! empty( $chart_info_hannan["series"] )) :?>
+				var payping_graph_tooltip1s1 = <?php echo esc_html(GF_tr_num( $chart_info_hannan["tooltips"], 'fa' )); ?>;
+				jQuery.plot(jQuery("#graph_placeholder1"), [<?php echo esc_html($chart_info_hannan["series"]); ?>], <?php echo esc_html($chart_info["options"]); ?>);
+				jQuery(window).resize(function () {
+					jQuery.plot(jQuery("#graph_placeholder1"), [<?php echo esc_html($chart_info_hannan["series"]); ?>], <?php echo esc_html($chart_info["options"]); ?>);
+				});
+				var previousPoint = null;
+				jQuery("#graph_placeholder1").bind("plothover", function (event, pos, item) {
+					startShowTooltip(item, payping_graph_tooltip1s1);
+				});
+				<?php endif;?>
+		
+		
+				<?php if (! empty( $chart_info_gateways["series"] )) :?>
+				var payping_graph_tooltip2s2 = <?php echo esc_html(GF_tr_num( $chart_info_gateways["tooltips"], 'fa' )); ?>;
+				jQuery.plot(jQuery("#graph_placeholder2"), [<?php echo esc_html($chart_info_gateways["series"]); ?>], <?php echo esc_html($chart_info["options"]); ?>);
+				jQuery(window).resize(function () {
+					jQuery.plot(jQuery("#graph_placeholder2"), [<?php echo esc_html($chart_info_gateways["series"]); ?>], <?php echo esc_html($chart_info["options"]); ?>);
+				});
+				var previousPoint = null;
+				jQuery("#graph_placeholder2").bind("plothover", function (event, pos, item) {
+					startShowTooltip(item, payping_graph_tooltip2s2);
+				});
+				<?php endif;?>
+		
+		
+				<?php if (! empty( $chart_info_site["series"] )) :?>
+				var payping_graph_tooltip3s3 = <?php echo esc_html(GF_tr_num( $chart_info_site["tooltips"], 'fa' )); ?>;
+				jQuery.plot(jQuery("#graph_placeholder3"), [<?php echo esc_html($chart_info_site["series"]); ?>], <?php echo esc_html($chart_info["options"]); ?>);
+				jQuery(window).resize(function () {
+					jQuery.plot(jQuery("#graph_placeholder3"), [<?php echo esc_html($chart_info_site["series"]); ?>], <?php echo esc_html($chart_info["options"]); ?>);
+				});
+				var previousPoint = null;
+				jQuery("#graph_placeholder3").bind("plothover", function (event, pos, item) {
+					startShowTooltip(item, payping_graph_tooltip3s3);
+				});
+				<?php endif;?>
+		
+				function showTooltip(x, y, contents) {
+					jQuery('<div id="payping_graph_tooltip">' + contents + '<div class="tooltip_tip1"></div></div>').css({
+						position: 'absolute',
+						display: 'none',
+						opacity: 1,
+						width: '150px',
+						height: '60px',
+						top: y - 89,
+						left: x - 79
+					}).appendTo("body").fadeIn(200);
+				}
+		
+				function convertToMoney(number) {
+					var currency = getCurrentCurrency();
+					return currency.toMoney(number);
+				}
+		
+				function getCurrentCurrency() {
+					<?php if ( ! class_exists( "RGCurrency" ) ) {
+						require_once( ABSPATH . "/" . WP_PLUGIN_DIR . "/gravityforms/currency.php" );
+					}
+					$current_currency = RGCurrency::get_currency( GFCommon::get_currency() );
+					?>
+					var currency = new Currency(<?php echo esc_html(GFCommon::json_encode( $current_currency )); ?>);
+					return currency;
+				}
+		
+				function weekday(val, axis) {
+					var g_y = new Date(val).getFullYear();
+					var g_m = new Date(val).getMonth() + 1;
+					var g_d = new Date(val).getDate();
+					shamsi = gregorian_to_jalali(g_y, g_m, g_d);
+					sh_month = ["-", "فروردین", "اردیبهشت", "خرداد", "تير", "مرداد", "شهريور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
+					week = ["يكشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه", "شنبه"];
+					week = week[new Date(val).getDay()];
+					return week + ' - ' + shamsi[2] + ' ' + sh_month[shamsi[1]] + ' ' + shamsi[0];
+				}
+		
+				function shamsi_1(val, axis) {
+					var g_y = new Date(val).getFullYear();
+					var g_m = new Date(val).getMonth() + 1;
+					var g_d = new Date(val).getDate();
+					shamsi = gregorian_to_jalali(g_y, g_m, g_d);
+					sh_month = ["-", "فروردین", "اردیبهشت", "خرداد", "تير", "مرداد", "شهريور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
+					return shamsi[2] + ' ' + sh_month[shamsi[1]] + ' ' + shamsi[0];
+				}
+		
+				function shamsi_2(val, axis) {
+					var g_y = new Date(val).getFullYear();
+					var g_m = new Date(val).getMonth() + 1;
+					var g_d = new Date(val).getDate();
+					shamsi = gregorian_to_jalali(g_y, g_m, g_d);
+					sh_month = ["-", "فروردین", "اردیبهشت", "خرداد", "تير", "مرداد", "شهريور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
+					H = new Date(val).getHours();
+					H = (H < 10) ? "0" + H : H;
+					i = new Date(val).getMinutes();
+					i = (i < 10) ? "0" + i : i;
+					s = new Date(val).getSeconds();
+					s = (s < 10) ? "0" + s : s;
+					return ' ساعت ' + H;
+				}
+			</script>
+			<?php
+		}
+		
+		// Enqueue the graph scripts
+		wp_add_inline_script('jquery', 'jQuery(document).ready(function($) { ' . enqueue_graph_scripts() . ' });');
 	}
 
 	
@@ -2115,7 +2126,8 @@ class GFPersian_Chart_payping {
 			$max && 
 			$min &&
 			isset( $_POST['gf_payping_chart'] ) && 
-			wp_verify_nonce( $_POST['gf_payping_chart'], 'search' )
+			//wp_verify_nonce( $_POST['gf_payping_chart'], 'search' )
+			wp_verify_nonce( sanitize_text_field( wp_unslash ( $_POST['gf_payping_chart']) ) , 'search' )
 		) {
 			list( $y2, $m2, $d2 ) = explode( "-", $max );
 
