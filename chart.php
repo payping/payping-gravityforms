@@ -102,45 +102,17 @@ class GFPersian_Chart_payping {
             }
         </style>
 		<?php
-		wp_dequeue_script( 'jquery-ui-datepicker' );
+		//wp_dequeue_script( 'jquery-ui-datepicker' );
 		wp_dequeue_script( 'gform_datepicker_init' );
-
-		wp_register_script( 'jquery-ui-jdatepicker', GFPersian_Payments::get_base_url() . '/assets/js/jalali-datepicker.js', array(
-			'jquery',
-			'jquery-migrate',
-			'jquery-ui-core',
-		), GFCommon::$version, true );
-		wp_enqueue_script( 'jquery-ui-jdatepicker' );
-
-		wp_enqueue_style( "gform_datepicker_init", GFCommon::get_base_url() . "/css/datepicker.css", null, GFCommon::$version );
-		do_action( 'gf_gateway_js' );
-		function enqueue_custom_admin_script() {
-			wp_enqueue_script(
-				'shamsi-chart', 
-				esc_url(GFPersian_Payments::get_base_url()) . '/assets/js/shamsi_chart.js', 
-				array('jquery'), 
-				null, 
-				true
-			);
-		}
-		add_action('admin_enqueue_scripts', 'enqueue_custom_admin_script');
 		
-        function enqueue_datepicker_script() {
-			?>
-			<script type="text/javascript">
-				var dp = jQuery.noConflict();
-				dp(document).ready(function () {
-					jQuery('.datepicker').datepicker({
-						dateFormat: 'yy-mm-dd',
-						showButtonPanel: true,
-						changeMonth: true,
-						changeYear: true
-					});
-				});
-			</script>
-			<?php
-		}
-		wp_add_inline_script('jquery-ui-datepicker', 'jQuery(document).ready(function($) { ' . enqueue_datepicker_script() . ' });');
+		
+
+		//wp_enqueue_style( "gform_datepicker_init", GFCommon::get_base_url() . "/css/datepicker.css", null, GFCommon::$version );
+		do_action( 'ppgf_gateway_js' );
+		
+		
+        
+		
 		?>		
         <div class="wrap">
             <ul class="subsubsub">
@@ -391,7 +363,7 @@ class GFPersian_Chart_payping {
                     </div>
 
                     <div class="payping_summary_item">
-                        <div class="payping_summary_title"><?php echo $sales_label; ?></div>
+                        <div class="payping_summary_title"><?php echo esc_html($sales_label); ?></div>
                         <div class="payping_summary_value"><?php echo esc_html(GF_tr_num( $total_sales, 'fa' )); ?></div>
                     </div>
 
@@ -585,144 +557,9 @@ class GFPersian_Chart_payping {
                 </div>
             </div>
         </div>
+		
 		<?php
-		function enqueue_graph_scripts() {
-			?>
-			<script type="text/javascript">
-				function startShowTooltip(item, graph) {
-					if (item) {
-						if (!previousPoint || previousPoint[0] != item.datapoint[0]) {
-							previousPoint = item.datapoint;
-							jQuery("#payping_graph_tooltip").remove();
-							var x = item.datapoint[0].toFixed(2),
-								y = item.datapoint[1].toFixed(2);
-							showTooltip(item.pageX, item.pageY, graph[item.dataIndex]);
-						}
-					}
-					else {
-						jQuery("#payping_graph_tooltip").remove();
-						previousPoint = null;
-					}
-				}
 		
-				<?php if (! empty( $chart_info["series"] )) :?>
-				var payping_graph_tooltips = <?php echo esc_html(GF_tr_num( $chart_info["tooltips"], 'fa' )); ?>;
-				jQuery.plot(jQuery("#graph_placeholder"), [<?php echo esc_html($chart_info["series"]); ?>], <?php echo esc_html($chart_info["options"]); ?>);
-				jQuery(window).resize(function () {
-					jQuery.plot(jQuery("#graph_placeholder"), [<?php echo esc_html($chart_info["series"]); ?>], <?php echo esc_html($chart_info["options"]); ?>);
-				});
-				var previousPoint = null;
-				jQuery("#graph_placeholder").bind("plothover", function (event, pos, item) {
-					startShowTooltip(item, payping_graph_tooltips);
-				});
-				<?php endif;?>
-		
-		
-				<?php if (! empty( $chart_info_hannan["series"] )) :?>
-				var payping_graph_tooltip1s1 = <?php echo esc_html(GF_tr_num( $chart_info_hannan["tooltips"], 'fa' )); ?>;
-				jQuery.plot(jQuery("#graph_placeholder1"), [<?php echo esc_html($chart_info_hannan["series"]); ?>], <?php echo esc_html($chart_info["options"]); ?>);
-				jQuery(window).resize(function () {
-					jQuery.plot(jQuery("#graph_placeholder1"), [<?php echo esc_html($chart_info_hannan["series"]); ?>], <?php echo esc_html($chart_info["options"]); ?>);
-				});
-				var previousPoint = null;
-				jQuery("#graph_placeholder1").bind("plothover", function (event, pos, item) {
-					startShowTooltip(item, payping_graph_tooltip1s1);
-				});
-				<?php endif;?>
-		
-		
-				<?php if (! empty( $chart_info_gateways["series"] )) :?>
-				var payping_graph_tooltip2s2 = <?php echo esc_html(GF_tr_num( $chart_info_gateways["tooltips"], 'fa' )); ?>;
-				jQuery.plot(jQuery("#graph_placeholder2"), [<?php echo esc_html($chart_info_gateways["series"]); ?>], <?php echo esc_html($chart_info["options"]); ?>);
-				jQuery(window).resize(function () {
-					jQuery.plot(jQuery("#graph_placeholder2"), [<?php echo esc_html($chart_info_gateways["series"]); ?>], <?php echo esc_html($chart_info["options"]); ?>);
-				});
-				var previousPoint = null;
-				jQuery("#graph_placeholder2").bind("plothover", function (event, pos, item) {
-					startShowTooltip(item, payping_graph_tooltip2s2);
-				});
-				<?php endif;?>
-		
-		
-				<?php if (! empty( $chart_info_site["series"] )) :?>
-				var payping_graph_tooltip3s3 = <?php echo esc_html(GF_tr_num( $chart_info_site["tooltips"], 'fa' )); ?>;
-				jQuery.plot(jQuery("#graph_placeholder3"), [<?php echo esc_html($chart_info_site["series"]); ?>], <?php echo esc_html($chart_info["options"]); ?>);
-				jQuery(window).resize(function () {
-					jQuery.plot(jQuery("#graph_placeholder3"), [<?php echo esc_html($chart_info_site["series"]); ?>], <?php echo esc_html($chart_info["options"]); ?>);
-				});
-				var previousPoint = null;
-				jQuery("#graph_placeholder3").bind("plothover", function (event, pos, item) {
-					startShowTooltip(item, payping_graph_tooltip3s3);
-				});
-				<?php endif;?>
-		
-				function showTooltip(x, y, contents) {
-					jQuery('<div id="payping_graph_tooltip">' + contents + '<div class="tooltip_tip1"></div></div>').css({
-						position: 'absolute',
-						display: 'none',
-						opacity: 1,
-						width: '150px',
-						height: '60px',
-						top: y - 89,
-						left: x - 79
-					}).appendTo("body").fadeIn(200);
-				}
-		
-				function convertToMoney(number) {
-					var currency = getCurrentCurrency();
-					return currency.toMoney(number);
-				}
-		
-				function getCurrentCurrency() {
-					<?php if ( ! class_exists( "RGCurrency" ) ) {
-						require_once( ABSPATH . "/" . WP_PLUGIN_DIR . "/gravityforms/currency.php" );
-					}
-					$current_currency = RGCurrency::get_currency( GFCommon::get_currency() );
-					?>
-					var currency = new Currency(<?php echo esc_html(GFCommon::json_encode( $current_currency )); ?>);
-					return currency;
-				}
-		
-				function weekday(val, axis) {
-					var g_y = new Date(val).getFullYear();
-					var g_m = new Date(val).getMonth() + 1;
-					var g_d = new Date(val).getDate();
-					shamsi = gregorian_to_jalali(g_y, g_m, g_d);
-					sh_month = ["-", "فروردین", "اردیبهشت", "خرداد", "تير", "مرداد", "شهريور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
-					week = ["يكشنبه", "دوشنبه", "سه شنبه", "چهارشنبه", "پنج شنبه", "جمعه", "شنبه"];
-					week = week[new Date(val).getDay()];
-					return week + ' - ' + shamsi[2] + ' ' + sh_month[shamsi[1]] + ' ' + shamsi[0];
-				}
-		
-				function shamsi_1(val, axis) {
-					var g_y = new Date(val).getFullYear();
-					var g_m = new Date(val).getMonth() + 1;
-					var g_d = new Date(val).getDate();
-					shamsi = gregorian_to_jalali(g_y, g_m, g_d);
-					sh_month = ["-", "فروردین", "اردیبهشت", "خرداد", "تير", "مرداد", "شهريور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
-					return shamsi[2] + ' ' + sh_month[shamsi[1]] + ' ' + shamsi[0];
-				}
-		
-				function shamsi_2(val, axis) {
-					var g_y = new Date(val).getFullYear();
-					var g_m = new Date(val).getMonth() + 1;
-					var g_d = new Date(val).getDate();
-					shamsi = gregorian_to_jalali(g_y, g_m, g_d);
-					sh_month = ["-", "فروردین", "اردیبهشت", "خرداد", "تير", "مرداد", "شهريور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
-					H = new Date(val).getHours();
-					H = (H < 10) ? "0" + H : H;
-					i = new Date(val).getMinutes();
-					i = (i < 10) ? "0" + i : i;
-					s = new Date(val).getSeconds();
-					s = (s < 10) ? "0" + s : s;
-					return ' ساعت ' + H;
-				}
-			</script>
-			<?php
-		}
-		
-		// Enqueue the graph scripts
-		wp_add_inline_script('jquery', 'jQuery(document).ready(function($) { ' . enqueue_graph_scripts() . ' });');
 	}
 
 	
@@ -778,10 +615,10 @@ class GFPersian_Chart_payping {
 			$c       = 'blue';
 			$dt      = "points: { symbol: 'diamond', fillColor: '#058DC7' }, color: '#058DC7'}";
 			$t       = esc_html__( 'پی‌پینگ این فرم', 'payping-gravityforms' );
-		
+			$tblname = GFPersian_DB_payping::get_entry_table_name();
 			$query = $wpdb->prepare(
 				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				FROM " . $tblname . " l
 				WHERE form_id = %d AND l.status = %s AND l.is_fulfilled = 1 AND l.payment_method = %s
 				GROUP BY DATE(l.payment_date)
 				ORDER BY l.payment_date DESC",
@@ -798,10 +635,10 @@ class GFPersian_Chart_payping {
 			$c       = 'green';
 			$dt      = "points: { symbol: 'square', fillColor: '#50B432' }, color: '#50B432'}";
 			$t       = esc_html__( 'همه روشهای این فرم', 'payping-gravityforms' );
-		
+			$tblname = GFPersian_DB_payping::get_entry_table_name();
 			$query = $wpdb->prepare(
 				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				FROM " . $tblname . " l
 				WHERE form_id = %d AND l.status = %s AND l.is_fulfilled = 1
 				GROUP BY DATE(l.payment_date)
 				ORDER BY l.payment_date DESC",
@@ -817,10 +654,10 @@ class GFPersian_Chart_payping {
 			$c       = 'orang';
 			$dt      = "}";
 			$t       = esc_html__( "همه فرمهای پی‌پینگ", 'payping-gravityforms' );
-		
+			$tblname = GFPersian_DB_payping::get_entry_table_name();
 			$query = $wpdb->prepare(
 				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				FROM " . $tblname . " l
 				WHERE l.status = %s AND l.is_fulfilled = 1 AND l.payment_method = %s
 				GROUP BY DATE(l.payment_date)
 				ORDER BY l.payment_date DESC",
@@ -836,10 +673,10 @@ class GFPersian_Chart_payping {
 			$c       = 'red';
 			$dt      = "points: { symbol: 'triangle', fillColor: '#AA4643' }, color: '#AA4643'}";
 			$t       = esc_html__( "همه فرمهای سایت", 'payping-gravityforms' );
-		
+			$tblname = GFPersian_DB_payping::get_entry_table_name();
 			$query = $wpdb->prepare(
 				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				FROM " . $tblname . " l
 				WHERE l.status = %s AND l.is_fulfilled = 1
 				GROUP BY DATE(l.payment_date)
 				ORDER BY l.payment_date DESC",
@@ -958,10 +795,10 @@ class GFPersian_Chart_payping {
 			$c       = 'blue';
 			$dt      = "points: { symbol: 'diamond', fillColor: '#058DC7' }, color: '#058DC7'}";
 			$t       = esc_html__( "پی‌پینگ این فرم", 'payping-gravityforms' );
-		
+			$tblname = GFPersian_DB_payping::get_entry_table_name();
 			$query = $wpdb->prepare(
 				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				FROM " . $tblname . " l
 				WHERE form_id = %d AND l.status = %s AND l.is_fulfilled = 1 AND l.payment_method = %s
 				GROUP BY DATE(l.payment_date)
 				ORDER BY l.payment_date DESC",
@@ -978,10 +815,10 @@ class GFPersian_Chart_payping {
 			$c       = 'green';
 			$dt      = "points: { symbol: 'square', fillColor: '#50B432' }, color: '#50B432'}";
 			$t       = esc_html__( "همه روشهای این فرم", 'payping-gravityforms' );
-		
+			$tblname = GFPersian_DB_payping::get_entry_table_name();
 			$query = $wpdb->prepare(
 				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				FROM " . $tblname . " l
 				WHERE form_id = %d AND l.status = %s AND l.is_fulfilled = 1
 				GROUP BY DATE(l.payment_date)
 				ORDER BY l.payment_date DESC",
@@ -997,10 +834,10 @@ class GFPersian_Chart_payping {
 			$c       = 'orang';
 			$dt      = "}";
 			$t       = esc_html__( "همه فرمهای پی‌پینگ", 'payping-gravityforms' );
-		
+			$tblname = GFPersian_DB_payping::get_entry_table_name();
 			$query = $wpdb->prepare(
 				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				FROM " . $tblname . " l
 				WHERE l.status = %s AND l.is_fulfilled = 1 AND l.payment_method = %s
 				GROUP BY DATE(l.payment_date)
 				ORDER BY l.payment_date DESC",
@@ -1016,10 +853,10 @@ class GFPersian_Chart_payping {
 			$c       = 'red';
 			$dt      = "points: { symbol: 'triangle', fillColor: '#AA4643' }, color: '#AA4643'}";
 			$t       = esc_html__( "همه فرم های سایت", 'payping-gravityforms' );
-		
+			$tblname = GFPersian_DB_payping::get_entry_table_name();
 			$query = $wpdb->prepare(
 				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				FROM " . $tblname . " l
 				WHERE l.status = %s AND l.is_fulfilled = 1
 				GROUP BY DATE(l.payment_date)
 				ORDER BY l.payment_date DESC",
@@ -1196,10 +1033,10 @@ class GFPersian_Chart_payping {
 			$c       = 'blue';
 			$dt      = "points: { symbol: 'diamond', fillColor: '#058DC7' }, color: '#058DC7'}";
 			$t       = esc_html__( "پی‌پینگ این فرم", 'payping-gravityforms' );
-		
+			$tblname = GFPersian_DB_payping::get_entry_table_name();
 			$query = $wpdb->prepare(
 				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				FROM " . $tblname . " l
 				WHERE form_id = %d AND l.status = %s AND l.is_fulfilled = 1 AND l.payment_method = %s
 				GROUP BY DATE(l.payment_date)
 				ORDER BY l.payment_date DESC",
@@ -1216,10 +1053,10 @@ class GFPersian_Chart_payping {
 			$c       = 'green';
 			$dt      = "points: { symbol: 'square', fillColor: '#50B432' }, color: '#50B432'}";
 			$t       = esc_html__( "همه روشهای این فرم", 'payping-gravityforms' );
-		
+			$tblname = GFPersian_DB_payping::get_entry_table_name();
 			$query = $wpdb->prepare(
 				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				FROM " . $tblname . " l
 				WHERE form_id = %d AND l.status = %s AND l.is_fulfilled = 1
 				GROUP BY DATE(l.payment_date)
 				ORDER BY l.payment_date DESC",
@@ -1235,10 +1072,10 @@ class GFPersian_Chart_payping {
 			$c       = 'orang';
 			$dt      = "}";
 			$t       = esc_html__( "همه فرمهای پی‌پینگ", 'payping-gravityforms' );
-		
+			$tblname = GFPersian_DB_payping::get_entry_table_name();
 			$query = $wpdb->prepare(
 				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				FROM " . $tblname . " l
 				WHERE l.status = %s AND l.is_fulfilled = 1 AND l.payment_method = %s
 				GROUP BY DATE(l.payment_date)
 				ORDER BY l.payment_date DESC",
@@ -1254,10 +1091,10 @@ class GFPersian_Chart_payping {
 			$c       = 'red';
 			$dt      = "points: { symbol: 'triangle', fillColor: '#AA4643' }, color: '#AA4643'}";
 			$t       = esc_html__( "همه فرمهای پی‌پینگ", 'payping-gravityforms' );
-		
+			$tblname = GFPersian_DB_payping::get_entry_table_name();
 			$query = $wpdb->prepare(
 				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				FROM " . $tblname . " l
 				WHERE l.status = %s AND l.is_fulfilled = 1
 				GROUP BY DATE(l.payment_date)
 				ORDER BY l.payment_date DESC",
@@ -1473,10 +1310,10 @@ class GFPersian_Chart_payping {
 			$c       = 'blue';
 			$dt      = "points: { symbol: 'diamond', fillColor: '#058DC7' }, color: '#058DC7'}";
 			$t       = esc_html__( "پی‌پینگ این فرم", 'payping-gravityforms' );
-		
+			$tblname = GFPersian_DB_payping::get_entry_table_name();
 			$query = $wpdb->prepare(
 				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				FROM " . $tblname . " l
 				WHERE form_id = %d AND l.status = %s AND l.is_fulfilled = 1 AND l.payment_method = %s
 				GROUP BY HOUR(date), DAY(date)
 				ORDER BY l.payment_date DESC",
@@ -1493,10 +1330,10 @@ class GFPersian_Chart_payping {
 			$c       = 'green';
 			$dt      = "points: { symbol: 'square', fillColor: '#50B432' }, color: '#50B432'}";
 			$t       = esc_html__( "همه روشهای این فرم", 'payping-gravityforms' );
-		
+			$tblname = GFPersian_DB_payping::get_entry_table_name();
 			$query = $wpdb->prepare(
 				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				FROM " . $tblname . " l
 				WHERE form_id = %d AND l.status = %s AND l.is_fulfilled = 1
 				GROUP BY HOUR(date), DAY(date)
 				ORDER BY l.payment_date DESC",
@@ -1512,10 +1349,10 @@ class GFPersian_Chart_payping {
 			$c       = 'orang';
 			$dt      = "color: '#EDC240'}";
 			$t       = esc_html__( "همه فرمهای پی‌پینگ", 'payping-gravityforms' );
-		
+			$tblname = GFPersian_DB_payping::get_entry_table_name();
 			$query = $wpdb->prepare(
 				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				FROM " . $tblname . " l
 				WHERE l.status = %s AND l.is_fulfilled = 1 AND l.payment_method = %s
 				GROUP BY HOUR(date), DAY(date)
 				ORDER BY l.payment_date DESC",
@@ -1531,10 +1368,10 @@ class GFPersian_Chart_payping {
 			$c       = 'red';
 			$dt      = "points: { symbol: 'triangle', fillColor: '#AA4643' }, color: '#AA4643'}";
 			$t       = esc_html__( "همه فرم های سایت", 'payping-gravityforms' );
-		
+			$tblname = GFPersian_DB_payping::get_entry_table_name();
 			$query = $wpdb->prepare(
 				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				FROM " . $tblname . " l
 				WHERE l.status = %s AND l.is_fulfilled = 1
 				GROUP BY HOUR(date), DAY(date)
 				ORDER BY l.payment_date DESC",
@@ -1653,10 +1490,10 @@ class GFPersian_Chart_payping {
 			$c  = 'blue';
 			$dt = "points: { symbol: 'diamond', fillColor: '#058DC7' }, color: '#058DC7'}";
 			$t  = esc_html__( "پی‌پینگ این فرم", 'payping-gravityforms' );
-		
+			$tblname = GFPersian_DB_payping::get_entry_table_name();
 			$query = $wpdb->prepare(
 				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				FROM " . $tblname . " l
 				WHERE form_id = %d AND l.status = %s AND l.is_fulfilled = 1 AND l.payment_method = %s
 				GROUP BY DATE(l.payment_date)
 				ORDER BY DATE(l.payment_date) DESC",
@@ -1673,10 +1510,10 @@ class GFPersian_Chart_payping {
 			$c       = 'green';
 			$dt      = "points: { symbol: 'square', fillColor: '#50B432' }, color: '#50B432'}";
 			$t       = esc_html__( "همه روشهای این فرم", 'payping-gravityforms' );
-		
+			$tblname = GFPersian_DB_payping::get_entry_table_name();
 			$query = $wpdb->prepare(
 				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				FROM " . $tblname . " l
 				WHERE form_id = %d AND l.status = %s AND l.is_fulfilled = 1
 				GROUP BY DATE(l.payment_date)
 				ORDER BY DATE(l.payment_date) DESC",
@@ -1692,10 +1529,10 @@ class GFPersian_Chart_payping {
 			$c       = 'orang';
 			$dt      = "}";
 			$t       = esc_html__( "همه فرمهای پی‌پینگ", 'payping-gravityforms' );
-		
+			$tblname = GFPersian_DB_payping::get_entry_table_name();
 			$query = $wpdb->prepare(
 				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				FROM " . $tblname . " l
 				WHERE l.status = %s AND l.is_fulfilled = 1 AND l.payment_method = %s
 				GROUP BY DATE(l.payment_date)
 				ORDER BY DATE(l.payment_date) DESC",
@@ -1711,10 +1548,10 @@ class GFPersian_Chart_payping {
 			$c       = 'red';
 			$dt      = "points: { symbol: 'triangle', fillColor: '#AA4643' }, color: '#AA4643'}";
 			$t       = esc_html__( "همه فرمهای سایت", 'payping-gravityforms' );
-		
+			$tblname = GFPersian_DB_payping::get_entry_table_name();
 			$query = $wpdb->prepare(
 				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				FROM " . $tblname . " l
 				WHERE l.status = %s AND l.is_fulfilled = 1
 				GROUP BY DATE(l.payment_date)
 				ORDER BY DATE(l.payment_date) DESC",
@@ -1827,10 +1664,10 @@ class GFPersian_Chart_payping {
 			$c       = 'blue';
 			$dt      = "points: { symbol: 'diamond', fillColor: '#058DC7' }, color: '#058DC7'}";
 			$t       = esc_html__( "پی‌پینگ این فرم", 'payping-gravityforms' );
-		
+			$tblname = GFPersian_DB_payping::get_entry_table_name();
 			$query = $wpdb->prepare(
 				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				FROM " . $tblname . " l
 				WHERE form_id = %d AND l.status = %s AND l.is_fulfilled = 1 AND l.payment_method = %s
 				GROUP BY DATE(l.payment_date)
 				ORDER BY DATE(l.payment_date) DESC",
@@ -1847,10 +1684,10 @@ class GFPersian_Chart_payping {
 			$c       = 'green';
 			$dt      = "points: { symbol: 'square', fillColor: '#50B432' }, color: '#50B432'}";
 			$t       = esc_html__( "همه روشهای این فرم", 'payping-gravityforms' );
-		
+			$tblname = GFPersian_DB_payping::get_entry_table_name();
 			$query = $wpdb->prepare(
 				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				FROM " . $tblname . " l
 				WHERE form_id = %d AND l.status = %s AND l.is_fulfilled = 1
 				GROUP BY DATE(l.payment_date)
 				ORDER BY DATE(l.payment_date) DESC",
@@ -1866,10 +1703,10 @@ class GFPersian_Chart_payping {
 			$c       = 'orang';
 			$dt      = "}";
 			$t       = esc_html__( "همه فرمهای پی‌پینگ", 'payping-gravityforms' );
-		
+			$tblname = GFPersian_DB_payping::get_entry_table_name();
 			$query = $wpdb->prepare(
 				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				FROM " . $tblname . " l
 				WHERE l.status = %s AND l.is_fulfilled = 1 AND l.payment_method = %s
 				GROUP BY DATE(l.payment_date)
 				ORDER BY DATE(l.payment_date) DESC",
@@ -1884,10 +1721,10 @@ class GFPersian_Chart_payping {
 			$c       = 'red';
 			$dt      = "points: { symbol: 'triangle', fillColor: '#AA4643' }, color: '#AA4643'}";
 			$t       = esc_html__( "همه فرم های سایت", 'payping-gravityforms' );
-		
+			$tblname = GFPersian_DB_payping::get_entry_table_name();
 			$query = $wpdb->prepare(
 				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				FROM " . $tblname . " l
 				WHERE l.status = %s AND l.is_fulfilled = 1
 				GROUP BY DATE(l.payment_date)
 				ORDER BY DATE(l.payment_date) DESC",
@@ -2044,10 +1881,10 @@ class GFPersian_Chart_payping {
 			$c       = 'blue';
 			$dt      = "points: { symbol: 'diamond', fillColor: '#058DC7' }, color: '#058DC7'}";
 			$t       = esc_html__( "پی‌پینگ این فرم", 'payping-gravityforms' );
-		
+			$tblname = GFPersian_DB_payping::get_entry_table_name();
 			$query = $wpdb->prepare(
 				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				FROM " . $tblname . " l
 				WHERE form_id = %d AND l.status = %s AND l.is_fulfilled = 1 AND l.payment_method = %s
 				GROUP BY DATE(l.payment_date)
 				ORDER BY DATE(l.payment_date) DESC",
@@ -2064,10 +1901,10 @@ class GFPersian_Chart_payping {
 			$c       = 'green';
 			$dt      = "points: { symbol: 'square', fillColor: '#50B432' }, color: '#50B432'}";
 			$t       = esc_html__( "همه روشهای این فرم", 'payping-gravityforms' );
-		
+			$tblname = GFPersian_DB_payping::get_entry_table_name();
 			$query = $wpdb->prepare(
 				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				FROM " . $tblname . " l
 				WHERE form_id = %d AND l.status = %s AND l.is_fulfilled = 1
 				GROUP BY DATE(l.payment_date)
 				ORDER BY DATE(l.payment_date) DESC",
@@ -2083,10 +1920,10 @@ class GFPersian_Chart_payping {
 			$c       = 'orang';
 			$dt      = "}";
 			$t       = esc_html__( "همه فرمهای پی‌پینگ", 'payping-gravityforms' );
-		
+			$tblname = GFPersian_DB_payping::get_entry_table_name();
 			$query = $wpdb->prepare(
 				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				FROM " . $tblname . " l
 				WHERE l.status = %s AND l.is_fulfilled = 1 AND l.payment_method = %s
 				GROUP BY DATE(l.payment_date)
 				ORDER BY DATE(l.payment_date) DESC",
@@ -2102,10 +1939,10 @@ class GFPersian_Chart_payping {
 			$c       = 'red';
 			$dt      = "points: { symbol: 'triangle', fillColor: '#AA4643' }, color: '#AA4643'}";
 			$t       = esc_html__( "همه فرمهای سایت", 'payping-gravityforms' );
-		
+			$tblname = GFPersian_DB_payping::get_entry_table_name();
 			$query = $wpdb->prepare(
 				"SELECT CONVERT_TZ(l.payment_date, '+00:00', %s) as date, sum(l.payment_amount) as amount_sold, count(l.id) as new_sales
-				FROM " . esc_sql( GFPersian_DB_payping::get_entry_table_name() ) . " l
+				FROM " . $tblname . " l
 				WHERE l.status = %s AND l.is_fulfilled = 1
 				GROUP BY DATE(l.payment_date)
 				ORDER BY DATE(l.payment_date) DESC",

@@ -44,7 +44,7 @@ class GFPersian_Gateway_payping {
 			add_action( 'gform_entry_info', array( __CLASS__, 'payment_entry_detail' ), 4, 2 );
 			add_action( 'gform_after_update_entry', array( __CLASS__, 'update_payment_entry' ), 4, 2 );
 
-			if ( get_option( "gf_payping_configured" ) ) {
+			if ( get_option( "ppgf_payping_configured" ) ) {
 				add_filter( 'gform_form_settings_menu', array( __CLASS__, 'toolbar' ), 10, 2 );
 				add_action( 'gform_form_settings_page_payping', array( __CLASS__, 'feed_page' ) );
 			}
@@ -66,7 +66,7 @@ class GFPersian_Gateway_payping {
 
 			add_action( 'wp_ajax_gf_payping_update_feed_active', array( __CLASS__, 'update_feed_active' ) );
 		}
-		if ( get_option( "gf_payping_configured" ) ) {
+		if ( get_option( "ppgf_payping_configured" ) ) {
 			add_filter( "gform_disable_post_creation", array( __CLASS__, "delay_posts" ), 10, 3 );
 			add_filter( "gform_is_delayed_pre_process_feed", array( __CLASS__, "delay_addons" ), 10, 4 );
 
@@ -88,14 +88,14 @@ class GFPersian_Gateway_payping {
 	public static function admin_notice_persian_gf() {
 		$class_safe   = 'notice notice-error';
 		$message_safe = sprintf( esc_html__( "برای استفاده از نسخه جدید درگاه های پرداخت گرویتی فرم نصب بسته فارسی ساز نسخه 2.3.1 به بالا الزامی است. برای نصب فارسی ساز %sکلیک کنید%s.", "payping-gravityforms" ), '<a href="' . admin_url( "plugin-install.php?tab=plugin-information&plugin=persian-gravity-forms&TB_iframe=true&width=772&height=884" ) . '">', '</a>' );
-		printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class_safe ), esc_html( $message_safe ) );
+		printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class_safe ), wp_kses_post( $message_safe ) );
 	}
 
 	// -------------------------------------------------
 	public static function admin_notice_gf_support() {
 		$class_safe   = 'notice notice-error';
 		$message_safe = sprintf( esc_html__( "درگاه پی‌پینگ نیاز به گرویتی فرم نسخه %s به بالا دارد. برای بروز رسانی هسته گرویتی فرم به %sسایت گرویتی فرم فارسی%s مراجعه نمایید .", "payping-gravityforms" ), self::$min_gravityforms_version, "<a href='http:///11378' target='_blank'>", "</a>" );
-		printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class_safe ), esc_html( $message_safe ) );
+		printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class_safe ), wp_kses_post( $message_safe ) );
 
 	}
 
@@ -135,9 +135,9 @@ class GFPersian_Gateway_payping {
 
 	// -------------------------------------------------
 	private static function setup() {
-		if ( get_option( "gf_payping_version" ) != self::$version ) {
+		if ( get_option( "ppgf_payping_version" ) != self::$version ) {
 			GFPersian_DB_payping::update_table();
-			update_option( "gf_payping_version", self::$version );
+			update_option( "ppgf_payping_version", self::$version );
 		}
 	}
 
@@ -218,10 +218,10 @@ class GFPersian_Gateway_payping {
 			die( esc_html__( "شما مجوز کافی برای این کار را ندارید . سطح دسترسی شما پایین تر از حد مجاز است . ", "payping-gravityforms" ) );
 		}
 		GFPersian_DB_payping::drop_tables();
-		delete_option( "gf_payping_settings" );
-		delete_option( "gf_payping_configured" );
-		delete_option( "gf_payping_version" );
-		$plugin = basename( dirname( __FILE__ ) ) . "/index.php";
+		delete_option( "ppgf_payping_settings" );
+		delete_option( "ppgf_payping_configured" );
+		delete_option( "ppgf_payping_version" );
+		$plugin = basename( dirname( __FILE__ ) ) . "/payping-gravityforms.php";
 		deactivate_plugins( $plugin );
 		update_option( 'payping_gf_recently_activated', array( $plugin => time() ) + (array) get_option( 'payping_gf_recently_activated' ) );
 	}
@@ -351,7 +351,7 @@ class GFPersian_Gateway_payping {
 
 		if ( ! empty( $config["meta"] ) && is_array( $config["meta"] ) && $config = $config["meta"] ) {
 
-			$user_registration_slug = apply_filters( 'gf_user_registration_slug', 'gravityformsuserregistration' );
+			$user_registration_slug = apply_filters( 'ppgf_user_registration_slug', 'gravityformsuserregistration' );
 
 			if ( $slug != $user_registration_slug && ! empty( $config["addon"] ) && $config["addon"] == 'true' ) {
 				$flag = true;
@@ -476,7 +476,7 @@ class GFPersian_Gateway_payping {
 
                 <h2>
 					<?php esc_html_e( "فیدهای درگاه پی‌پینگ", "payping-gravityforms" );
-					if ( get_option( "gf_payping_configured" ) ) { ?>
+					if ( get_option( "ppgf_payping_configured" ) ) { ?>
                         <a class="add-new-h2"
                            href="admin.php?page=gravityforms_payping&view=edit"><?php esc_html_e( "افزودن جدید", "payping-gravityforms" ) ?></a>
 						<?php
@@ -510,7 +510,7 @@ class GFPersian_Gateway_payping {
                         <th scope="col" id="cb" class="manage-column column-cb check-column"
                             style="padding:13px 3px;width:30px"><input type="checkbox"/></th>
                         <th scope="col" id="active" class="manage-column"
-                            style="width:<?php echo esc_attr($arg !== 'per-form' ? '50px' : '20px'); ?>"><?php echo $arg != 'per-form' ? esc_html__( 'وضعیت', 'payping-gravityforms' ) : '' ?></th>
+                            style="width:<?php echo esc_attr($arg !== 'per-form' ? '50px' : '20px'); ?>"><?php echo esc_html($arg != 'per-form') ? esc_html__( 'وضعیت', 'payping-gravityforms' ) : '' ?></th>
                         <th scope="col" class="manage-column"
                             style="width:<?php echo esc_attr($arg != 'per-form' ? '65px' : '30%'); ?>"><?php esc_html_e( " آیدی فید", "payping-gravityforms" ) ?></th>
 						<?php if ( $arg != 'per-form' ) { ?>
@@ -525,7 +525,7 @@ class GFPersian_Gateway_payping {
                         <th scope="col" id="cb" class="manage-column column-cb check-column" style="padding:13px 3px;">
                             <input type="checkbox"/></th>
                         <th scope="col" id="active"
-                            class="manage-column"><?php echo $arg != 'per-form' ? esc_html__( 'وضعیت', 'payping-gravityforms' ) : '' ?></th>
+                            class="manage-column"><?php echo esc_html($arg != 'per-form') ? esc_html__( 'وضعیت', 'payping-gravityforms' ) : '' ?></th>
                         <th scope="col" class="manage-column"><?php esc_html_e( "آیدی فید", "payping-gravityforms" ) ?></th>
 						<?php if ( $arg != 'per-form' ) { ?>
                             <th scope="col"
@@ -542,7 +542,7 @@ class GFPersian_Gateway_payping {
 						$settings = GFPersian_DB_payping::get_feed_by_form( rgget( 'id' ), false );
 					}
 
-					if ( ! get_option( "gf_payping_configured" ) ) {
+					if ( ! get_option( "ppgf_payping_configured" ) ) {
 						?>
                         <tr>
                             <td colspan="5" style="padding:20px;">
@@ -648,41 +648,7 @@ class GFPersian_Gateway_payping {
                 </table>
             </form>
         </div>
-        <?php
-			wp_enqueue_script( 'toggle-script', '', array( 'jquery' ), '1.0.0', true );
-		?>
-
-		<script type="text/javascript">
-			function DeleteSetting(id) {
-				jQuery("#action_argument").val(id);
-				jQuery("#action").val("delete");
-				jQuery("#confirmation_list_form")[0].submit();
-			}
-
-			function ToggleActive(img, feed_id) {
-				var is_active = img.src.indexOf("active1.png") >= 0;
-				if (is_active) {
-					img.src = img.src.replace("active1.png", "active0.png");
-					jQuery(img).attr('title', '<?php esc_html_e( "درگاه غیر فعال است", "payping-gravityforms" ) ?>').attr('alt', '<?php esc_html_e( "درگاه غیر فعال است", "payping-gravityforms" ) ?>');
-				}
-				else {
-					img.src = img.src.replace("active0.png", "active1.png");
-					jQuery(img).attr('title', '<?php esc_html_e( "درگاه فعال است", "payping-gravityforms" ) ?>').attr('alt', '<?php esc_html_e( "درگاه فعال است", "payping-gravityforms" ) ?>');
-				}
-				var mysack = new sack(ajaxurl);
-				mysack.execute = 1;
-				mysack.method = 'POST';
-				mysack.setVar("action", "gf_payping_update_feed_active");
-				mysack.setVar("gf_payping_update_feed_active", "<?php echo wp_create_nonce( "gf_payping_update_feed_active" ) ?>");
-				mysack.setVar("feed_id", feed_id);
-				mysack.setVar("is_active", is_active ? 0 : 1);
-				mysack.onError = function () {
-					alert('<?php esc_html_e( "خطای Ajax رخ داده است", "payping-gravityforms" ) ?>')
-				};
-				mysack.runAJAX();
-				return true;
-			}
-		</script>
+        
 		<?php
 	}
 
@@ -756,7 +722,7 @@ class GFPersian_Gateway_payping {
 				$field_id    = $field[0];
 				$field_label = esc_html( GFCommon::truncate_middle( $field[1], 40 ) );
 				$selected    = $field_id == $selected_field ? "selected='selected'" : "";
-				$str         .= "<option value='" . $field_id . "' " . $selected . ">" . $field_label . "</option>";
+				$str         .= "<option value='" . esc_html($field_id) . "' " . esc_html($selected) . ">" . esc_html($field_label) . "</option>";
 			}
 		}
 		$str .= "</select>";
@@ -816,7 +782,7 @@ class GFPersian_Gateway_payping {
 
 		if ( ! empty( $payment_gateway ) && $payment_gateway == "payping" ) {
 
-			do_action( 'gf_gateway_entry_detail' );
+			do_action( 'ppgf_gateway_entry_detail' );
 
 			?>
             <hr/>
@@ -949,7 +915,7 @@ class GFPersian_Gateway_payping {
 				echo esc_html__( 'درگاه پرداخت : پی‌پینگ (غیر قابل ویرایش)', 'payping-gravityforms' );
 			}
 
-			echo esc_html('<br/>');
+			
 		}
 	}
 
@@ -958,7 +924,7 @@ class GFPersian_Gateway_payping {
 
 		check_admin_referer( 'gforms_save_entry', 'gforms_save_entry' );
 
-		do_action( 'gf_gateway_update_entry' );
+		do_action( 'ppgf_gateway_update_entry' );
 
 		$entry = GFPersian_Payments::get_entry( $entry_id );
 
@@ -1064,7 +1030,7 @@ class GFPersian_Gateway_payping {
 		if ( rgpost( "uninstall" ) ) {
 			check_admin_referer( "uninstall", "gf_payping_uninstall" );
 			self::uninstall();
-			echo '<div class="updated fade" style="padding:20px;">' . esc_html__( "درگاه با موفقیت غیرفعال شد و اطلاعات مربوط به آن نیز از بین رفت برای فعالسازی مجدد میتوانید از طریق افزونه های وردپرس اقدام نمایید .", "payping-gravityforms" ) . '</div>';
+			echo wp_kses_post('<div class="updated fade" style="padding:20px;">' . esc_html__( "درگاه با موفقیت غیرفعال شد و اطلاعات مربوط به آن نیز از بین رفت برای فعالسازی مجدد میتوانید از طریق افزونه های وردپرس اقدام نمایید .", "payping-gravityforms" ) . '</div>');
 
 			return;
 		} else if ( isset( $_POST["gf_payping_submit"] ) ) {
@@ -1074,33 +1040,33 @@ class GFPersian_Gateway_payping {
 				"merchent" => rgpost( 'gf_payping_merchent' ),
 				"gname"    => rgpost( 'gf_payping_gname' ),
 			);
-			update_option( "gf_payping_settings", array_map( 'sanitize_text_field', $settings ) );
-			if ( isset( $_POST["gf_payping_configured"] ) ) {
-				update_option( "gf_payping_configured", sanitize_text_field( $_POST["gf_payping_configured"] ) );
+			update_option( "ppgf_payping_settings", array_map( 'sanitize_text_field', $settings ) );
+			if ( isset( $_POST["ppgf_payping_configured"] ) ) {
+				update_option( "ppgf_payping_configured", sanitize_text_field( $_POST["ppgf_payping_configured"] ) );
 			} else {
-				delete_option( "gf_payping_configured" );
+				delete_option( "ppgf_payping_configured" );
 			}
 		} else {
-			$settings = get_option( "gf_payping_settings" );
+			$settings = get_option( "ppgf_payping_settings" );
 		}
 
 		if ( ! empty( $_POST ) ) {
 
-			if ( isset( $_POST["gf_payping_configured"] ) && ( $Response = self::Request( 'valid_checker', '', '', '' ) ) && $Response != false ) {
+			if ( isset( $_POST["ppgf_payping_configured"] ) && ( $Response = self::Request( 'valid_checker', '', '', '' ) ) && $Response != false ) {
 
 				if ( $Response === true ) {
-					echo '<div class="updated fade" style="padding:6px">' . esc_html__( "ارتباط با درگاه برقرار شد و اطلاعات وارد شده صحیح است .", "payping-gravityforms" ) . '</div>';
+					echo wp_kses_post('<div class="updated fade" style="padding:6px">' . esc_html__( "ارتباط با درگاه برقرار شد و اطلاعات وارد شده صحیح است .", "payping-gravityforms" ) . '</div>');
 				} else if ( $Response == 'sandbox' ) {
-					echo '<div class="updated fade" style="padding:6px">' . esc_html__( "در حالت تستی نیاز به ورود اطلاعات صحیح نمی باشد .", "payping-gravityforms" ) . '</div>';
+					echo wp_kses_post('<div class="updated fade" style="padding:6px">' . esc_html__( "در حالت تستی نیاز به ورود اطلاعات صحیح نمی باشد .", "payping-gravityforms" ) . '</div>');
 				} else {
-					echo '<div class="error fade" style="padding:6px">' . esc_html( $Response ) . '</div>';
+					echo wp_kses_post('<div class="error fade" style="padding:6px">' . esc_html( $Response ) . '</div>');
 				}
 
 			} else {
-				echo '<div class="updated fade" style="padding:6px">' . esc_html__( "تنظیمات ذخیره شدند .", "payping-gravityforms" ) . '</div>';
+				echo wp_kses_post('<div class="updated fade" style="padding:6px">' . esc_html__( "تنظیمات ذخیره شدند .", "payping-gravityforms" ) . '</div>');
 			}
 		} else if ( isset( $_GET['subview'] ) && $_GET['subview'] == 'gravityforms_payping' && isset( $_GET['updated'] ) ) {
-			echo '<div class="updated fade" style="padding:6px">' . esc_html__( "تنظیمات ذخیره شدند .", "payping-gravityforms" ) . '</div>';
+			echo wp_kses_post('<div class="updated fade" style="padding:6px">' . esc_html__( "تنظیمات ذخیره شدند .", "payping-gravityforms" ) . '</div>');
 		}
 		?>
 
@@ -1119,12 +1085,12 @@ class GFPersian_Gateway_payping {
 
                 <tr>
                     <th scope="row"><label
-                                for="gf_payping_configured"><?php esc_html_e( "فعالسازی", "payping-gravityforms" ); ?></label>
+                                for="ppgf_payping_configured"><?php esc_html_e( "فعالسازی", "payping-gravityforms" ); ?></label>
                     </th>
                     <td>
-					<input type="checkbox" name="gf_payping_configured" id="gf_payping_configured" <?php echo get_option( "gf_payping_configured" ) ? "checked='checked'" : "" ?>/>
+					<input type="checkbox" name="ppgf_payping_configured" id="ppgf_payping_configured" <?php echo get_option( "ppgf_payping_configured" ) ? "checked='checked'" : "" ?>/>
                         <label class="inline"
-                               for="gf_payping_configured"><?php esc_html_e( "بله", "payping-gravityforms" ); ?></label>
+                               for="ppgf_payping_configured"><?php esc_html_e( "بله", "payping-gravityforms" ); ?></label>
                     </td>
                 </tr>
 
@@ -1192,9 +1158,8 @@ class GFPersian_Gateway_payping {
                             class="gf_delete_notice"><?php esc_html_e( "تذکر : بعد از غیرفعالسازی تمامی اطلاعات مربوط به پی‌پینگ حذف خواهد شد", "payping-gravityforms" ) ?></div>
 
 					<?php
-					$uninstall_button = '<input  style="font-family:tahoma !important;" type="submit" name="uninstall" value="' . esc_html__( "غیر فعال سازی درگاه پی‌پینگ", "payping-gravityforms" ) . '" class="button" onclick="return confirm(\'' . esc_html__( "تذکر : بعد از غیرفعالسازی تمامی اطلاعات مربوط به پی‌پینگ حذف خواهد شد . آیا همچنان مایل به غیر فعالسازی میباشید؟", "payping-gravityforms" ) . '\');"/>';
-					$variable_safe = apply_filters( "gform_payping_uninstall_button", $uninstall_button );
-					echo $variable_safe;
+					echo '<input  style="font-family:tahoma !important;" type="submit" name="uninstall" value="' . esc_html__( "غیر فعال سازی درگاه پی‌پینگ", "payping-gravityforms" ) . '" class="button" onclick="return confirm(\'' . esc_html__( "تذکر : بعد از غیرفعالسازی تمامی اطلاعات مربوط به پی‌پینگ حذف خواهد شد . آیا همچنان مایل به غیر فعالسازی میباشید؟", "payping-gravityforms" ) . '\');"/>';
+					
 					?>
 
                 </div>
@@ -1207,7 +1172,7 @@ class GFPersian_Gateway_payping {
 
 	// -------------------------------------------------
 	public static function get_gname() {
-		$settings = get_option( "gf_payping_settings" );
+		$settings = get_option( "ppgf_payping_settings" );
 		if ( isset( $settings["gname"] ) ) {
 			$gname = $settings["gname"];
 		} else {
@@ -1219,7 +1184,7 @@ class GFPersian_Gateway_payping {
 
 	// -------------------------------------------------
 	private static function get_merchent() {
-		$settings = get_option( "gf_payping_settings" );
+		$settings = get_option( "ppgf_payping_settings" );
 		$merchent = isset( $settings["merchent"] ) ? $settings["merchent"] : '';
 
 		return trim( $merchent );
@@ -1366,7 +1331,7 @@ class GFPersian_Gateway_payping {
 						<?php
 						$menu_items = apply_filters( 'gform_toolbar_menu', GFForms::get_toolbar_menu_items( absint( $_get_form_id ) ), absint( $_get_form_id ) );
 						$variable_safe = GFForms::format_toolbar_menu_items( $menu_items );
-						echo $variable_safe; ?>
+						echo wp_kses_post($variable_safe); ?>
 
                         <li class="gf_form_switcher">
                             <label for="export_form"><?php esc_html_e( 'یک فید انتخاب کنید', 'payping-gravityforms' ) ?></label>
@@ -1379,7 +1344,7 @@ class GFPersian_Gateway_payping {
 									<?php foreach ( $feeds as $feed ) {
 										$selected = $feed["id"] == $id ? "selected='selected'" : ""; ?>
                                         <option
-                                                value="<?php echo esc_attr($feed["id"]) ?>" <?php echo esc_html($selected) ?> ><?php echo sprintf( esc_html__( 'فرم: %s (فید: %s)', 'payping-gravityforms' ), $feed["form_title"], $feed["id"] ) ?></option>
+                                                value="<?php echo esc_attr($feed["id"]) ?>" <?php echo esc_html($selected) ?> ><?php echo sprintf( esc_html__( 'فرم: %s (فید: %s)', 'payping-gravityforms' ), esc_html($feed["form_title"]), esc_html($feed["id"]) ) ?></option>
 									<?php } ?>
                                 </select>
 								<?php
@@ -1415,7 +1380,7 @@ class GFPersian_Gateway_payping {
 									'id'      => $get_form['id']
 								);
 								$url = add_query_arg( $query, admin_url( 'admin.php' ) );
-								echo $tab['name'] == 'payping' ? '<li class="active">' : '<li>';
+								echo esc_html($tab['name']) == 'payping' ? '<li class="active">' : '<li>';
 								?>
 								<a href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( $tab['label'] ); ?></a>
 								<span></span>
@@ -1472,7 +1437,7 @@ class GFPersian_Gateway_payping {
 												foreach ( $available_forms as $current_form ) {
 													$selected = absint( $current_form->id ) == $_get_form_id ? 'selected="selected"' : ''; ?>
                                                     <option
-                                                            value="<?php echo absint( $current_form->id ) ?>" <?php echo $selected; ?>><?php echo esc_html( $current_form->title ) ?></option>
+                                                            value="<?php echo esc_attr(absint( $current_form->id )); ?>" <?php echo esc_html($selected); ?>><?php echo esc_html( $current_form->title ) ?></option>
 													<?php
 												}
 												?>
@@ -1493,7 +1458,7 @@ class GFPersian_Gateway_payping {
                                     </div>
 								<?php } else { ?>
                                     <table class="form-table gforms_form_settings"
-                                           id="payping_field_group" <?php echo empty( $_get_form_id ) ? "style='display:none;'" : "" ?>
+                                           id="payping_field_group" <?php echo esc_attr(empty( $_get_form_id )) ? "style='display:none;'" : "" ?>
                                            cellspacing="0" cellpadding="0">
                                         <tbody>
 
@@ -1504,7 +1469,7 @@ class GFPersian_Gateway_payping {
                                             <td>
                                                 <input type="checkbox" name="gf_payping_type"
                                                        id="gf_payping_type_subscription"
-                                                       value="subscription" <?php echo rgar( $config['meta'], 'type' ) == "subscription" ? "checked='checked'" : "" ?>/>
+                                                       value="subscription" <?php echo esc_attr(rgar( $config['meta'], 'type' )) == "subscription" ? "checked='checked'" : "" ?>/>
                                                 <label for="gf_payping_type"></label>
                                                 <span
                                                         class="description"><?php esc_html_e( 'در صورتی که تیک بزنید عملیات ثبت نام که توسط افزونه User Registration انجام خواهد شد تنها برای پرداخت های موفق عمل خواهد کرد', 'payping-gravityforms' ); ?></span>
@@ -1518,7 +1483,7 @@ class GFPersian_Gateway_payping {
                                             <td>
                                                 <input type="text" name="gf_payping_desc_pm" id="gf_payping_desc_pm"
                                                        class="fieldwidth-1"
-                                                       value="<?php echo rgar( $config["meta"], "desc_pm" ) ?>"/>
+                                                       value="<?php echo esc_attr(rgar( $config["meta"], "desc_pm" )); ?>"/>
                                                 <span
                                                         class="description"><?php esc_html_e( "شورت کد ها : {form_id} , {form_title} , {entry_id}", "payping-gravityforms" ); ?></span>
                                             </td>
@@ -1531,8 +1496,7 @@ class GFPersian_Gateway_payping {
                                             <td class="payping_customer_fields_desc">
 												<?php
 												if ( ! empty( $form ) ) {
-													$options_safe = self::get_customer_information_desc( $form, $config );
-													echo $options_safe;
+													echo sprintf(self::get_customer_information_desc( $form, $config ));
 												}
 												?>
                                             </td>
@@ -1545,8 +1509,7 @@ class GFPersian_Gateway_payping {
                                             <td class="payping_customer_fields_email">
 												<?php
 												if ( ! empty( $form ) ) {
-													$options_safe = self::get_customer_information_email( $form, $config );
-													echo $options_safe;
+													echo sprintf(self::get_customer_information_email( $form, $config ));
 												}
 												?>
                                             </td>
@@ -1559,8 +1522,7 @@ class GFPersian_Gateway_payping {
                                             <td class="payping_customer_fields_mobile">
 												<?php
 												if ( ! empty( $form ) ) {
-													$options_safe = self::get_customer_information_mobile( $form, $config );
-													echo $options_safe;
+													echo sprintf(self::get_customer_information_mobile( $form, $config ));
 												}
 												?>
                                             </td>
@@ -1569,7 +1531,7 @@ class GFPersian_Gateway_payping {
 
 										<?php $display_post_fields = ! empty( $form ) ? GFCommon::has_post_field( $form["fields"] ) : false; ?>
 
-                                        <tr <?php echo $display_post_fields ? "" : "style='display:none;'" ?>>
+                                        <tr <?php echo esc_attr($display_post_fields) ? "" : "style='display:none;'" ?>>
                                             <th>
 												<?php esc_html_e( "نوشته بعد از پرداخت موفق", "payping-gravityforms" ); ?>
                                             </th>
@@ -1577,20 +1539,20 @@ class GFPersian_Gateway_payping {
                                                 <select id="gf_payping_update_action1"
                                                         name="gf_payping_update_action1">
                                                     <option
-                                                            value="default" <?php echo rgar( $config["meta"], "update_post_action1" ) == "default" ? "selected='selected'" : "" ?>><?php esc_html_e( "وضعیت پیشفرض فرم", "payping-gravityforms" ) ?></option>
+                                                            value="default" <?php echo esc_attr(rgar( $config["meta"], "update_post_action1" )) == "default" ? "selected='selected'" : "" ?>><?php esc_html_e( "وضعیت پیشفرض فرم", "payping-gravityforms" ) ?></option>
                                                     <option
-                                                            value="publish" <?php echo rgar( $config["meta"], "update_post_action1" ) == "publish" ? "selected='selected'" : "" ?>><?php esc_html_e( "منتشر شده", "payping-gravityforms" ) ?></option>
+                                                            value="publish" <?php echo esc_attr(rgar( $config["meta"], "update_post_action1" )) == "publish" ? "selected='selected'" : "" ?>><?php esc_html_e( "منتشر شده", "payping-gravityforms" ) ?></option>
                                                     <option
-                                                            value="draft" <?php echo rgar( $config["meta"], "update_post_action1" ) == "draft" ? "selected='selected'" : "" ?>><?php esc_html_e( "پیشنویس", "payping-gravityforms" ) ?></option>
+                                                            value="draft" <?php echo esc_attr(rgar( $config["meta"], "update_post_action1" )) == "draft" ? "selected='selected'" : "" ?>><?php esc_html_e( "پیشنویس", "payping-gravityforms" ) ?></option>
                                                     <option
-                                                            value="pending" <?php echo rgar( $config["meta"], "update_post_action1" ) == "pending" ? "selected='selected'" : "" ?>><?php esc_html_e( "در انتظار بررسی", "payping-gravityforms" ) ?></option>
+                                                            value="pending" <?php echo esc_attr(rgar( $config["meta"], "update_post_action1" )) == "pending" ? "selected='selected'" : "" ?>><?php esc_html_e( "در انتظار بررسی", "payping-gravityforms" ) ?></option>
                                                     <option
-                                                            value="private" <?php echo rgar( $config["meta"], "update_post_action1" ) == "private" ? "selected='selected'" : "" ?>><?php esc_html_e( "خصوصی", "payping-gravityforms" ) ?></option>
+                                                            value="private" <?php echo esc_attr(rgar( $config["meta"], "update_post_action1" )) == "private" ? "selected='selected'" : "" ?>><?php esc_html_e( "خصوصی", "payping-gravityforms" ) ?></option>
                                                 </select>
                                             </td>
                                         </tr>
 
-                                        <tr <?php echo $display_post_fields ? "" : "style='display:none;'" ?>>
+                                        <tr <?php echo esc_attr($display_post_fields) ? "" : "style='display:none;'" ?>>
                                             <th>
 												<?php esc_html_e( "نوشته قبل از پرداخت موفق", "payping-gravityforms" ); ?>
                                             </th>
@@ -1598,17 +1560,17 @@ class GFPersian_Gateway_payping {
                                                 <select id="gf_payping_update_action2"
                                                         name="gf_payping_update_action2">
                                                     <option
-                                                            value="dont" <?php echo rgar( $config["meta"], "update_post_action2" ) == "dont" ? "selected='selected'" : "" ?>><?php esc_html_e( "عدم ایجاد پست", "payping-gravityforms" ) ?></option>
+                                                            value="dont" <?php echo esc_attr(rgar( $config["meta"], "update_post_action2" )) == "dont" ? "selected='selected'" : "" ?>><?php esc_html_e( "عدم ایجاد پست", "payping-gravityforms" ) ?></option>
                                                     <option
-                                                            value="default" <?php echo rgar( $config["meta"], "update_post_action2" ) == "default" ? "selected='selected'" : "" ?>><?php esc_html_e( "وضعیت پیشفرض فرم", "payping-gravityforms" ) ?></option>
+                                                            value="default" <?php echo esc_attr(rgar( $config["meta"], "update_post_action2" )) == "default" ? "selected='selected'" : "" ?>><?php esc_html_e( "وضعیت پیشفرض فرم", "payping-gravityforms" ) ?></option>
                                                     <option
-                                                            value="publish" <?php echo rgar( $config["meta"], "update_post_action2" ) == "publish" ? "selected='selected'" : "" ?>><?php esc_html_e( "منتشر شده", "payping-gravityforms" ) ?></option>
+                                                            value="publish" <?php echo esc_attr(rgar( $config["meta"], "update_post_action2" )) == "publish" ? "selected='selected'" : "" ?>><?php esc_html_e( "منتشر شده", "payping-gravityforms" ) ?></option>
                                                     <option
-                                                            value="draft" <?php echo rgar( $config["meta"], "update_post_action2" ) == "draft" ? "selected='selected'" : "" ?>><?php esc_html_e( "پیشنویس", "payping-gravityforms" ) ?></option>
+                                                            value="draft" <?php echo esc_attr(rgar( $config["meta"], "update_post_action2" )) == "draft" ? "selected='selected'" : "" ?>><?php esc_html_e( "پیشنویس", "payping-gravityforms" ) ?></option>
                                                     <option
-                                                            value="pending" <?php echo rgar( $config["meta"], "update_post_action2" ) == "pending" ? "selected='selected'" : "" ?>><?php esc_html_e( "در انتظار بررسی", "payping-gravityforms" ) ?></option>
+                                                            value="pending" <?php echo esc_attr(rgar( $config["meta"], "update_post_action2" )) == "pending" ? "selected='selected'" : "" ?>><?php esc_html_e( "در انتظار بررسی", "payping-gravityforms" ) ?></option>
                                                     <option
-                                                            value="private" <?php echo rgar( $config["meta"], "update_post_action2" ) == "private" ? "selected='selected'" : "" ?>><?php esc_html_e( "خصوصی", "payping-gravityforms" ) ?></option>
+                                                            value="private" <?php echo esc_attr(rgar( $config["meta"], "update_post_action2" )) == "private" ? "selected='selected'" : "" ?>><?php esc_html_e( "خصوصی", "payping-gravityforms" ) ?></option>
                                                 </select>
                                             </td>
                                         </tr>
@@ -1620,7 +1582,7 @@ class GFPersian_Gateway_payping {
                                             <td>
                                                 <input type="checkbox" name="gf_payping_addon"
                                                        id="gf_payping_addon_true"
-                                                       value="true" <?php echo rgar( $config['meta'], 'addon' ) == "true" ? "checked='checked'" : "" ?>/>
+                                                       value="true" <?php echo esc_attr(rgar( $config['meta'], 'addon' )) == "true" ? "checked='checked'" : "" ?>/>
                                                 <label for="gf_payping_addon"></label>
                                                 <span
                                                         class="description"><?php esc_html_e( 'برخی افزودنی های گرویتی فرم دارای متد add_delayed_payment_support هستند. در صورتی که میخواهید این افزودنی ها تنها در صورت تراکنش موفق عمل کنند این گزینه را تیک بزنید.', 'payping-gravityforms' ); ?></span>
@@ -1681,17 +1643,17 @@ class GFPersian_Gateway_payping {
 																foreach ( $condition_field_ids as $i => $value ):?>
 
                                                                     <div class="gf_payping_conditional_div"
-                                                                         id="gf_payping_<?php echo intval( $i ); ?>__conditional_div">
+                                                                         id="gf_payping_<?php echo esc_html(intval( $i )); ?>__conditional_div">
 
                                                                         <select class="gf_payping_conditional_field_id"
-                                                                                id="gf_payping_<?php echo intval( $i ); ?>__conditional_field_id"
-                                                                                name="gf_payping_conditional_field_id[<?php echo intval( $i ); ?>]"
+                                                                                id="gf_payping_<?php echo esc_html(intval( $i )); ?>__conditional_field_id"
+                                                                                name="gf_payping_conditional_field_id[<?php echo esc_html(intval( $i )); ?>]"
                                                                                 title="">
                                                                         </select>
 
                                                                         <select class="gf_payping_conditional_operator"
-                                                                                id="gf_payping_<?php echo intval( $i ); ?>__conditional_operator"
-                                                                                name="gf_payping_conditional_operator[<?php echo intval( $i ); ?>]"
+                                                                                id="gf_payping_<?php echo esc_html(intval( $i )); ?>__conditional_operator"
+                                                                                name="gf_payping_conditional_operator[<?php echo esc_html(intval( $i )); ?>]"
                                                                                 style="font-family:tahoma,serif !important"
                                                                                 title="">
                                                                             <option value="is"><?php esc_html_e( "هست", "payping-gravityforms" ) ?></option>
@@ -1703,7 +1665,7 @@ class GFPersian_Gateway_payping {
                                                                             <option value="ends_with"><?php esc_html_e( "تمام میشود با", "payping-gravityforms" ) ?></option>
                                                                         </select>
 
-                                                                        <div id="gf_payping_<?php echo intval( $i ); ?>__conditional_value_container"
+                                                                        <div id="gf_payping_<?php echo esc_html(intval( $i )); ?>__conditional_value_container"
                                                                              style="display:inline;">
                                                                         </div>
 
@@ -1840,10 +1802,10 @@ class GFPersian_Gateway_payping {
 					});
 
 					<?php foreach ( $condition_field_ids as $i => $field_id ) : ?>
-					selectedField = "<?php echo str_replace( '"', '\"', $field_id )?>";
-					selectedValue = "<?php echo str_replace( '"', '\"', $condition_values[ '' . $i . '' ] )?>";
-					selectedOperator = "<?php echo str_replace( '"', '\"', $condition_operators[ '' . $i . '' ] )?>";
-					RefreshConditionRow("gf_payping_<?php echo intval( $i );?>__conditional", selectedField, selectedOperator, selectedValue, <?php echo intval( $i );?>);
+					selectedField = "<?php echo esc_html(str_replace( '"', '\"', $field_id )); ?>";
+					selectedValue = "<?php echo esc_html(str_replace( '"', '\"', $condition_values[ '' . $i . '' ] )); ?>";
+					selectedOperator = "<?php echo esc_html(str_replace( '"', '\"', $condition_operators[ '' . $i . '' ] )); ?>";
+					RefreshConditionRow("gf_payping_<?php echo esc_html(intval( $i ));?>__conditional", selectedField, selectedOperator, selectedValue, <?php echo esc_html(intval( $i ));?>);
 					<?php endforeach;?>
 				});
 
@@ -1978,10 +1940,10 @@ class GFPersian_Gateway_payping {
 	//Start Online Transaction
 	public static function Request( $confirmation, $form, $entry, $ajax ) {
 
-		do_action( 'gf_gateway_request_1', $confirmation, $form, $entry, $ajax );
-		do_action( 'gf_payping_request_1', $confirmation, $form, $entry, $ajax );
+		do_action( 'ppgf_gateway_request_1', $confirmation, $form, $entry, $ajax );
+		do_action( 'ppgf_payping_request_1', $confirmation, $form, $entry, $ajax );
 
-		if ( apply_filters( 'gf_payping_request_return', apply_filters( 'gf_gateway_request_return', false, $confirmation, $form, $entry, $ajax ), $confirmation, $form, $entry, $ajax ) ) {
+		if ( apply_filters( 'gf_payping_request_return', apply_filters( 'ppgf_gateway_request_return', false, $confirmation, $form, $entry, $ajax ), $confirmation, $form, $entry, $ajax ) ) {
 			return $confirmation;
 		}
 
@@ -2109,8 +2071,8 @@ class GFPersian_Gateway_payping {
 				$entry_id = GFAPI::add_entry( $entry );
 				$entry    = GFPersian_Payments::get_entry( $entry_id );
 
-				do_action( 'gf_gateway_request_add_entry', $confirmation, $form, $entry, $ajax );
-				do_action( 'gf_payping_request_add_entry', $confirmation, $form, $entry, $ajax );
+				do_action( 'ppgf_gateway_request_add_entry', $confirmation, $form, $entry, $ajax );
+				do_action( 'ppgf_payping_request_add_entry', $confirmation, $form, $entry, $ajax );
 
 				//-----------------------------------------------------------------
 				gform_update_meta( $entry_id, 'payment_gateway', self::get_gname() );
@@ -2137,10 +2099,10 @@ class GFPersian_Gateway_payping {
 
 			$ReturnPath = self::Return_URL( $form['id'], $entry_id );
 			//var_dump(self::$config); die();
-			$ResNumber  = apply_filters( 'gf_payping_res_number', apply_filters( 'gf_gateway_res_number', $entry_id, $entry, $form ), $entry, $form );
+			$ResNumber  = apply_filters( 'gf_payping_res_number', apply_filters( 'ppgf_gateway_res_number', $entry_id, $entry, $form ), $entry, $form );
 		} else {
 			$Amount      = absint( 2000 );
-			$ReturnPath  = esc_url_raw( $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'] );
+			$ReturnPath  = esc_url_raw( sanitize_text_field($_SERVER['SERVER_NAME']) . sanitize_text_field($_SERVER['REQUEST_URI']) );
 			$Email       = sanitize_email( '' );
 			$Mobile      = sanitize_text_field( '' );
 			$ResNumber   = absint( rand( 1000, 9999 ) );
@@ -2148,8 +2110,8 @@ class GFPersian_Gateway_payping {
 		}
 		$Mobile = GFPersian_Payments::fix_mobile( $Mobile );
 
-		do_action( 'gf_gateway_request_2', $confirmation, $form, $entry, $ajax );
-		do_action( 'gf_payping_request_2', $confirmation, $form, $entry, $ajax );
+		do_action( 'ppgf_gateway_request_2', $confirmation, $form, $entry, $ajax );
+		do_action( 'ppgf_payping_request_2', $confirmation, $form, $entry, $ajax );
 
 		if ( ! $custom ) {
 			$Amount = GFPersian_Payments::amount( $Amount, 'IRT', $form, $entry );
@@ -2250,7 +2212,7 @@ class GFPersian_Gateway_payping {
 	// #5
 	public static function Verify() {
 
-		if ( apply_filters( 'gf_gateway_payping_return', apply_filters( 'gf_gateway_verify_return', false ) ) ) {
+		if ( apply_filters( 'gf_gateway_payping_return', apply_filters( 'ppgf_gateway_verify_return', false ) ) ) {
 			return;
 		}
 
@@ -2462,7 +2424,7 @@ class GFPersian_Gateway_payping {
 					GFPersian_Payments::set_verification( $entry, __CLASS__, $__params );
 				}
 
-				$user_registration_slug = apply_filters( 'gf_user_registration_slug', 'gravityformsuserregistration' );
+				$user_registration_slug = apply_filters( 'ppgf_user_registration_slug', 'gravityformsuserregistration' );
 				$paypal_config          = array( 'meta' => array() );
 				if ( ! empty( $config["meta"]["addon"] ) && $config["meta"]["addon"] == 'true' ) {
 					if ( class_exists( 'GFAddon' ) && method_exists( 'GFAddon', 'get_registered_addons' ) ) {
