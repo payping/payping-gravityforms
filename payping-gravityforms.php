@@ -6,9 +6,11 @@ Description:  افزونه درگاه پرداخت پی‌پینگ برای Grav
 Plugin URI: https://www.payping.ir/
 Author: Hadi Hosseini
 Author URI: https://hosseini-dev.ir/
+Requires Plugins: persian-gravity-forms
 License: GPLv3 or later
 */
 if (!defined('ABSPATH')) exit;
+
 function callback_for_setting_up_scripts(){
     wp_enqueue_script( 'gf-admin-scripts', plugin_dir_url( __FILE__ ) . 'assets/js/scripts.js', array(), false, false );
     wp_enqueue_script( 'shamsi-chart', esc_url(GFPersian_Payments::get_base_url()) . '/assets/js/shamsi_chart.js', array('jquery'), null, false );
@@ -28,6 +30,5 @@ function callback_for_setting_up_scripts(){
     
 }
 add_action( 'admin_enqueue_scripts', 'callback_for_setting_up_scripts' );
-
-
 require_once('payping.php');
+
