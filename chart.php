@@ -15,92 +15,6 @@ class GFPersian_Chart_payping {
 			die( esc_html__( 'فرم درخواستی وجود ندارد.', 'payping-gravityforms' ) );
 		}
 		?>
-        <style type="text/css">
-            .payping_graph_container {
-                clear: both;
-                padding-left: 5px;
-                min-width: 789px;
-                margin-right: 50px;
-            }
-
-            .payping_message_container {
-                clear: both;
-                padding-left: 5px;
-                text-align: center;
-                padding-top: 120px;
-                border: 1px solid #CCC;
-                background-color: #FFF;
-                width: 100%;
-                height: 200px;
-            }
-
-            .payping_summary_container {
-                margin: 30px 60px;
-                text-align: center;
-                min-width: 740px;
-                margin-left: 50px;
-            }
-
-            .payping_summary_item {
-                width: 180px;
-                height: 70px;
-                border-radius: 5px;
-                background-color: #FFF;
-                border: 1px solid #CCC;
-                padding: 14px 8px;
-                margin: 6px 3px 6px 0;
-                display: -moz-inline-stack;
-                display: inline-block;
-                zoom: 1;
-                *display: inline;
-                text-align: center;
-            }
-
-            .payping_summary_value {
-                font-size: 20px;
-                margin: 5px 0;
-            }
-
-            .payping_summary_title {
-                height: 40px;
-            }
-
-            .tooltipbox_blue {
-                background: #0074A2;
-                padding: 5px 10px 5px 5px;
-                border-radius: 4px;
-                color: #fff;
-            }
-
-            .tooltipbox_green {
-                background: #50B432;
-                padding: 5px 10px 5px 5px;
-                border-radius: 4px;
-                color: #fff;
-            }
-
-            .tooltipbox_orang {
-                background: #EDC240;
-                padding: 5px 10px 5px 5px;
-                border-radius: 4px;
-                color: #fff;
-            }
-
-            .tooltipbox_red {
-                background: #AA4643;
-                padding: 5px 10px 5px 5px;
-                border-radius: 4px;
-                color: #fff;
-            }
-
-            .ui-datepicker-title select, .ui-datepicker-title option {
-                font-size: 11px !important;
-            }
-
-            .ui-datepicker th {
-                font-size: 12px !important;
-            }
-        </style>
 		<?php
 		//wp_dequeue_script( 'jquery-ui-datepicker' );
 		wp_dequeue_script( 'gform_datepicker_init' );
@@ -117,69 +31,69 @@ class GFPersian_Chart_payping {
         <div class="wrap">
             <ul class="subsubsub">
                 <li><a class="<?php echo ( ! rgget( "tab" ) || rgget( "tab" ) == "today" ) ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>"><?php esc_html_e( "امروز", "payping-gravityforms" ); ?></a>
+                       href="?page=gravityforms_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>"><?php esc_html_e( "امروز", "payping-gravityforms" ); ?></a>
                     |
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "yesterday" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=yesterday"><?php esc_html_e( "دیروز", "payping-gravityforms" ); ?></a>
+                       href="?page=gravityforms_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=yesterday"><?php esc_html_e( "دیروز", "payping-gravityforms" ); ?></a>
                     |
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "last7days" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=last7days"><?php esc_html_e( "هفت روز گذشته", "payping-gravityforms" ); ?></a>
+                       href="?page=gravityforms_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=last7days"><?php esc_html_e( "هفت روز گذشته", "payping-gravityforms" ); ?></a>
                     |
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "thisweek" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=thisweek"><?php esc_html_e( "هفته جاری", "payping-gravityforms" ); ?></a>
+                       href="?page=gravityforms_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=thisweek"><?php esc_html_e( "هفته جاری", "payping-gravityforms" ); ?></a>
                     |
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "last30days" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=last30days"><?php esc_html_e( "30 روز گذشته", "payping-gravityforms" ); ?></a>
+                       href="?page=gravityforms_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=last30days"><?php esc_html_e( "30 روز گذشته", "payping-gravityforms" ); ?></a>
                     |
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "thismonth" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=thismonth"><?php esc_html_e( "ماه جاری", "payping-gravityforms" ); ?></a>|
+                       href="?page=gravityforms_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=thismonth"><?php esc_html_e( "ماه جاری", "payping-gravityforms" ); ?></a>|
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "lastmonth" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=lastmonth"><?php esc_html_e( "ماه قبل", "payping-gravityforms" ); ?></a>|
+                       href="?page=gravityforms_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=lastmonth"><?php esc_html_e( "ماه قبل", "payping-gravityforms" ); ?></a>|
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "last2month" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=last2month"><?php esc_html_e( "2 ماه اخیر", "payping-gravityforms" ); ?></a>
+                       href="?page=gravityforms_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=last2month"><?php esc_html_e( "2 ماه اخیر", "payping-gravityforms" ); ?></a>
                     |
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "last3month" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=last3month"><?php esc_html_e( "3 ماه اخیر", "payping-gravityforms" ); ?></a>
+                       href="?page=gravityforms_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=last3month"><?php esc_html_e( "3 ماه اخیر", "payping-gravityforms" ); ?></a>
                     |
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "last6month" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=last6month"><?php esc_html_e( "6 ماه اخیر", "payping-gravityforms" ); ?></a>
+                       href="?page=gravityforms_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=last6month"><?php esc_html_e( "6 ماه اخیر", "payping-gravityforms" ); ?></a>
                     |
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "last9month" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=last9month"><?php esc_html_e( "9 ماه اخیر", "payping-gravityforms" ); ?></a>
+                       href="?page=gravityforms_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=last9month"><?php esc_html_e( "9 ماه اخیر", "payping-gravityforms" ); ?></a>
                     |
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "last12month" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=last12month"><?php esc_html_e( "یک سال اخیر", "payping-gravityforms" ); ?></a>
+                       href="?page=gravityforms_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=last12month"><?php esc_html_e( "یک سال اخیر", "payping-gravityforms" ); ?></a>
                     |
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "spring" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=spring"><?php esc_html_e( "بهار", "payping-gravityforms" ); ?></a>|
+                       href="?page=gravityforms_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=spring"><?php esc_html_e( "بهار", "payping-gravityforms" ); ?></a>|
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "summer" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=summer"><?php esc_html_e( "تابستان", "payping-gravityforms" ); ?></a>|
+                       href="?page=gravityforms_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=summer"><?php esc_html_e( "تابستان", "payping-gravityforms" ); ?></a>|
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "fall" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=fall"><?php esc_html_e( "پاییز", "payping-gravityforms" ); ?></a>|
+                       href="?page=gravityforms_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=fall"><?php esc_html_e( "پاییز", "payping-gravityforms" ); ?></a>|
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "winter" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=winter"><?php esc_html_e( "زمستان", "payping-gravityforms" ); ?></a>|
+                       href="?page=gravityforms_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=winter"><?php esc_html_e( "زمستان", "payping-gravityforms" ); ?></a>|
                 </li>
                 <li><a class="<?php echo rgget( "tab" ) == "thisyear" ? "current" : "" ?>"
-                       href="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=thisyear"><?php esc_html_e( "امسال", "payping-gravityforms" ); ?></a>
+                       href="?page=gravityforms_payping&view=stats&id=<?php echo esc_attr(rgget( 'id' )) ?>&tab=thisyear"><?php esc_html_e( "امسال", "payping-gravityforms" ); ?></a>
                 </li>
                 <br/><br/>
                 <form method="post"
-                      action="?page=gf_payping&view=stats&id=<?php echo esc_attr(rgget( "id" )) ?>&tab=selection"><?php wp_nonce_field( "search", "gf_payping_chart" ) ?>
+                      action="?page=gravityforms_payping&view=stats&id=<?php echo esc_attr(rgget( "id" )) ?>&tab=selection"><?php wp_nonce_field( "search", "gf_payping_chart" ) ?>
                     <span><?php esc_html_e( 'از تاریخ', 'payping-gravityforms' ) ?></span>
                     <input type="text" name="min" class="datepicker"
                            value="<?php echo esc_html(sanitize_text_field( rgpost( 'min' ) )); ?>" autocomplete="off"/>
