@@ -1857,6 +1857,8 @@ class GFPersian_Gateway_payping {
                 return index >= 0;
             }
         </script>
+        </style>
+		
         
 
 		<?php

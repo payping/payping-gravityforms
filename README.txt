@@ -2,7 +2,7 @@
 Contributors: hadihosseini, mahdisarani, payping
 Tags: payping, gravity forms, iran, گرویتی فرم, پی پینگ
 Requires at least: 4.0.0
-Requires Plugin: گرویتی فرم فارسی
+Requires Plugin: persian-gravity-forms
 Tested up to: 6.4.1
 Requires PHP: 7.2
 Stable tag: 2.3.1
