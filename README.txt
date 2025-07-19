@@ -3,9 +3,9 @@ Contributors: hadihosseini, mahdisarani, payping
 Tags: payping, gravity forms, iran, گرویتی فرم, پی پینگ
 Requires at least: 4.0.0
 Requires Plugin: persian-gravity-forms
-Tested up to: 6.4.1
+Tested up to: 6.7.2
 Requires PHP: 7.2
-Stable tag: 2.3.1
+Stable tag: 2.4.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -25,3 +25,18 @@ This plugin leverages the following third-party services:
 
 == Privacy Policy ==
 This plugin follows strict privacy guidelines. When using the api.payping.ir service, user data is securely transmitted and stored following industry best practices.
+
+
+== Changelog ==
+
+== 2.4.1 ==
+افزودن برخی از ویژگی ها.
+
+== 2.4.2 ==
+رفع خطای تنظیمات درگاه
+
+== 2.4.3 ==
+تغییر در نمایش نام پرداخت کننده
+
+== 2.4.4 ==
+رفع برخی از مشکلات گزارش شده

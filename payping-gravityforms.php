@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: PayPing GravityForms
-Version: 2.3.1
+Version: 2.4.4
 Description:  افزونه درگاه پرداخت پی‌پینگ برای Gravity forms
 Plugin URI: https://www.payping.ir/
 Author: Hadi Hosseini
@@ -27,8 +27,15 @@ function callback_for_setting_up_scripts(){
             'ajax_error_message' => esc_html__('خطای Ajax رخ داده است', 'payping-gravityforms')
         )
     );
-    
+    wp_enqueue_style(
+        'admin-styles-enqueue', plugin_dir_url( __FILE__ ) . 'assets/css/styles.css'
+    );
+    if ( is_rtl() ) {
+        $custom_css = " table.gforms_form_settings th { text-align: right !important; }";
+        wp_add_inline_style( 'admin-styles-enqueue', $custom_css );
+	} 
 }
 add_action( 'admin_enqueue_scripts', 'callback_for_setting_up_scripts' );
+
 require_once('payping.php');
 
