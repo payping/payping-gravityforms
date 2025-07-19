@@ -1857,8 +1857,6 @@ class GFPersian_Gateway_payping {
                 return index >= 0;
             }
         </script>
-        </style>
-		
         
 
 		<?php
@@ -1877,16 +1875,59 @@ class GFPersian_Gateway_payping {
 
 		$valid_checker = $confirmation == 'valid_checker';
 		$custom        = $confirmation == 'custom';
-
+		
 		global $current_user;
-		$user_id   = 0;
-		$user_name = esc_html__( 'مهمان', 'payping-gravityforms' );
+		$user_id = 0;
+		$user_name = esc_html__('مهمان', 'payping-gravityforms');
 
-		if ( $current_user && $user_data = get_userdata( $current_user->ID ) ) {
-			$user_id   = $current_user->ID;
-			$user_name = $user_data->display_name;
+		$form_first_name = '';
+		$form_last_name = '';
+
+		if (class_exists('GFAPI') && !empty($_POST['gform_submit'])) {
+			$form_id = absint($_POST['gform_submit']);
+			$form = GFAPI::get_form($form_id);
+			
+			if ($form && is_array($form)) {
+				foreach ($form['fields'] as $field) {
+					if ($field->type == 'name') {
+						$name_inputs = GFFormsModel::get_lead_field_value($entry, $field);
+						$form_first_name = rgar($name_inputs, $field->id . '.3', '');
+						$form_last_name = rgar($name_inputs, $field->id . '.6', '');
+						break;
+					}
+					
+					if ($field->type == 'text') {
+						$label = strtolower(remove_accents($field->label));
+						if (preg_match('/^(نام|name)$/u', $label)) {
+							$form_first_name = rgpost("input_{$field->id}");
+						}
+						if (preg_match('/(نام خانوادگی|last name|family name)/u', $label)) {
+							$form_last_name = rgpost("input_{$field->id}");
+						}
+					}
+				}
+			}
 		}
 
+
+		if ($current_user && $user_data = get_userdata($current_user->ID)) {
+			$user_id = $current_user->ID;
+			
+			if (!empty($form_first_name) || !empty($form_last_name)) {
+				$user_name = trim("$form_first_name $form_last_name");
+			}
+			else {
+				$first_name = get_user_meta($user_id, 'first_name', true);
+				$last_name = get_user_meta($user_id, 'last_name', true);
+				$full_name = trim("$first_name $last_name");
+				$user_name = !empty($full_name) ? $full_name : $user_data->display_name;
+			}
+		} 
+		else {
+			$full_name = trim("$form_first_name $form_last_name");
+			$user_name = !empty($full_name) ? $full_name : $user_name;
+		}
+		var_dump($user_name); die();
 		if ( ! $valid_checker ) {
 
 			$entry_id = $entry['id'];
@@ -2026,12 +2067,12 @@ class GFPersian_Gateway_payping {
 			$ReturnPath = self::Return_URL( $form['id'], $entry_id );
 			$ResNumber  = apply_filters( 'gf_payping_res_number', apply_filters( 'ppgf_gateway_res_number', $entry_id, $entry, $form ), $entry, $form );
 		} else {
-			$Amount      = absint( 2000 );
+			$Amount      = absint( 10000 );
 			$ReturnPath  = esc_url_raw( sanitize_text_field($_SERVER['SERVER_NAME']) . sanitize_text_field($_SERVER['REQUEST_URI']) );
-			$Email       = sanitize_email( '' );
-			$Mobile      = sanitize_text_field( '' );
-			$ResNumber   = absint( rand( 1000, 9999 ) );
+			$Email       = get_option('admin_email');
+			$Mobile      = get_option('admin_email');
 			$Description = esc_html__( 'جهت بررسی صحیح بودن تنظیمات درگاه گرویتی فرم پی‌پینگ', 'payping-gravityforms' );
+			$entry_id    = '1';
 		}
 		$Mobile = GFPersian_Payments::fix_mobile( $Mobile );
 
@@ -2047,17 +2088,19 @@ class GFPersian_Gateway_payping {
 
 
 		$data = array(
-			'payerName' => $user_name,
+			'PayerName' => $user_name,
 			'Amount' => $Amount,
-			'payerIdentity' => $Mobile,
-			'returnUrl' => $ReturnPath,
+			'PayerIdentity' => $Mobile,
+			'ReturnUrl' => $ReturnPath,
 			'Description' => $Description,
-			'clientRefId' => $entry_id
+			'ClientRefId' => $entry_id,
+			'NationalCode'	=> ''
 		);
-		
 		try {
-			$url = "https://api.payping.ir/v1/pay";
+			$url = "https://api.payping.ir/v3/pay";
 			$headers = array(
+				'X-Platform'         => 'GravityForms',
+        		'X-Platform-Version' => '2.3.1',
 				"Accept" => "application/json",
 				"Authorization" => "Bearer " . self::get_merchent(),
 				"Cache-Control" => "no-cache",
@@ -2072,18 +2115,17 @@ class GFPersian_Gateway_payping {
 					"timeout" => 30,
 				)
 			);
-			
+			var_dump($data); die();
 			if (is_wp_error($response)) {
 				echo "HTTP Request Error: " . esc_html($response->get_error_message());
 			} else {
 				$header = wp_remote_retrieve_response_code($response);
-		
 				if ($header == 200) {
 					$body = wp_remote_retrieve_body($response);
 					$response = json_decode($body, true);
 		
-					if (isset($response["code"]) && $response["code"] != '') {
-						$Payment_URL = sprintf('https://api.payping.ir/v1/pay/gotoipg/%s', $response["code"]);
+					if (isset($response["paymentCode"]) && $response["paymentCode"] != '') {
+						$Payment_URL = sprintf('https://api.payping.ir/v3/pay/start/%s', $response["paymentCode"]);
 						
 						if ($valid_checker) {
 							return true;
@@ -2135,273 +2177,395 @@ class GFPersian_Gateway_payping {
 
 
 	// #5
+	/**
+	 *  PayPing → GravityForms – Verify callback
+	 */
 	public static function Verify() {
 
+		// ـــ ۱) گذر از فیلترهای سفارشی و پیش‌شرط‌ها
 		if ( apply_filters( 'gf_gateway_payping_return', apply_filters( 'ppgf_gateway_verify_return', false ) ) ) {
 			return;
 		}
-
 		if ( ! self::is_gravityforms_supported() ) {
 			return;
 		}
 
-		if ( empty( $_GET['id'] ) || empty( $_GET['entry'] ) || ! is_numeric( rgget( 'id' ) ) || ! is_numeric( rgget( 'entry' ) ) ) {
+		// ـــ ۲) اعتبارسنجی ورودی‌های پایه (form_id , entry_id)
+		$form_id  = absint( rgget( 'id'   ) );
+		$entry_id = absint( rgget( 'entry') );
+		if ( ! $form_id || ! $entry_id ) {
 			return;
 		}
 
-		$form_id = sanitize_text_field($_GET['id']);
-		$entry_id = sanitize_text_field($_GET['entry']);
-
 		$entry = GFPersian_Payments::get_entry( $entry_id );
-
 		if ( is_wp_error( $entry ) ) {
 			return;
 		}
 
-		if ( isset( $entry["payment_method"] ) && $entry["payment_method"] == 'payping' ) {
+		// فقط پاسخ‌های مربوط به درگاه PayPing
+		if ( empty( $entry['payment_method'] ) || $entry['payment_method'] !== 'payping' ) {
+			return;
+		}
 
-			$form = RGFormsModel::get_form_meta( $form_id );
+		//----------------------------------------------
+		// ـــ ۳) بازیابی فرم و کانفیگ
+		//----------------------------------------------
+		$form          = RGFormsModel::get_form_meta( $form_id );
+		$payment_type  = gform_get_meta( $entry_id, 'payment_type' );
+		gform_delete_meta( $entry_id , 'payment_type' );
 
-			$payment_type = gform_get_meta( $entry["id"], 'payment_type' );
-			gform_delete_meta( $entry['id'], 'payment_type' );
+		$config = ( $payment_type === 'custom' )
+			? apply_filters( self::$author . '_gf_payping_config', [], $form, $entry )
+			: self::get_config_by_entry( $entry );
 
-			if ( $payment_type != 'custom' ) {
-				$config = self::get_config_by_entry( $entry );
-				if ( empty( $config ) ) {
-					return;
-				}
-			} else {
-				$config = apply_filters( self::$author . '_gf_payping_config', apply_filters( self::$author . '_gf_gateway_config', array(), $form, $entry ), $form, $entry );
-			}
+		if ( empty( $config ) && $payment_type !== 'custom' ) {
+			return;
+		}
 
+		//----------------------------------------------
+		// ـــ ۴) تهیه اطلاعات اولیه پرداخت
+		//----------------------------------------------
+		$Amount = ( $payment_type === 'custom' )
+			? gform_get_meta( $entry_id, 'hannanstd_part_price_' . $form_id )
+			: self::get_order_total( $form, $entry );
 
-			if ( ! empty( $entry["payment_date"] ) ) {
-				
-                if( ! class_exists("GFFormDisplay") )
-                    require_once(GFCommon::get_base_path() . "/form_display.php");
+		$Amount = ( $payment_type !== 'custom' )
+			? GFPersian_Payments::amount( $Amount, 'IRT', $form, $entry )   // تطبیق ارز
+			: intval( $Amount );
 
-                $default_anchor = 0;
-                $anchor         = gf_apply_filters( 'gform_confirmation_anchor', $form['id'], $default_anchor ) ? "<a id='gf_{$form['id']}' name='gf_{$form['id']}' class='gform_anchor' ></a>" : '';
-                $nl2br          = !empty( $form['confirmation'] ) && rgar( rgar( $form, 'confirmation' ), 'disableAutoformat' ) ? false : true;
-                $cssClass       = rgar( $form, 'cssClass' );
-                $confirmation = esc_html__('نتیجه تراکنش قبلا مشخص شده است.' , 'payping-gravityforms');
-                $confirmation   = empty( $confirmation ) ? "{$anchor} " : "{$anchor}<div id='gform_confirmation_wrapper_{$form['id']}' class='gform_confirmation_wrapper {$cssClass}'><div id='gform_confirmation_message_{$form['id']}' class='gform_confirmation_message_{$form['id']} gform_confirmation_message'>" . GFCommon::replace_variables( $confirmation, $form, $entry, false, true, $nl2br ) . '</div></div>';
-                GFFormDisplay::$submission[$form_id] = array("is_confirmation" => true, "confirmation_message" => $confirmation, "form" => $form, "entry" => $entry, "lead" => $entry,"page_number"=> 1);
-				
+		$Total_Money = GFCommon::to_money( $Amount, $entry['currency'] );
+		$transaction_type = ( ! empty( $config['meta']['type'] ) && $config['meta']['type'] === 'subscription' ) ? 2 : 1;
+
+		//----------------------------------------------
+		// ـــ ۵) واکشی و پاک‌سازی دادهٔ برگشتی درگاه
+		//----------------------------------------------
+		$raw_data     = isset( $_REQUEST['data'] ) ? wp_unslash( $_REQUEST['data'] ) : '';
+		$responseData = json_decode( $raw_data, true ) ?: [];
+
+		$status          = isset( $_REQUEST['status'] ) ? absint( $_REQUEST['status'] ) : null;
+		$Transaction_ID  = isset( $responseData['paymentRefId'] ) ? sanitize_text_field( $responseData['paymentRefId'] ) : null;
+		$CardNumber      = isset( $responseData['cardNumber']   ) ? sanitize_text_field( $responseData['cardNumber']   ) : '-';
+
+		//----------------------------------------------
+		// ـــ ۶) مسیر انصراف کاربر
+		//----------------------------------------------
+		if ( 0 === $status ) {
+			self::handle_payment_failure(
+				$entry, $form, 'cancelled',
+				'کاربر در صفحه بانک از پرداخت انصراف داده است.',
+				'تراکنش توسط شما لغو شد.',
+				$Transaction_ID, $Total_Money
+			);
+			return;
+		}
+
+		//----------------------------------------------
+		// ـــ ۷) اعتبارسنجی محلی پاسخ (amount , paymentCode …)
+		//----------------------------------------------
+		$validation_error = self::validate_return_data( $entry, $Amount, $responseData );
+		if ( $validation_error ) {
+			self::handle_payment_failure(
+				$entry, $form, 'failed',
+				$validation_error,
+				'خطایی در تأیید پرداخت رخ داده است. لطفاً مجدداً تلاش کنید.',
+				$Transaction_ID, $Total_Money
+			);
+			return;
+		}
+
+		//----------------------------------------------
+		// ـــ ۸) درخواست Verify به PayPing
+		//----------------------------------------------
+		$verify_result = self::verify_with_payping(
+			$Transaction_ID,
+			self::get_stored_payment_code( $entry_id ),
+			$Amount
+		);
+
+		// خطای ارتباط
+		if ( is_wp_error( $verify_result ) ) {
+			self::handle_payment_failure(
+				$entry, $form, 'failed',
+				'خطا در ارتباط به پی‌پینگ: ' . $verify_result->get_error_message(),
+				'ارتباط با سرویس پرداخت برقرار نشد.',
+				$Transaction_ID, $Total_Money
+			);
+			return;
+		}
+
+		//----------------------------------------------
+		// ـــ ۹) تحلیل پاسخ Verify
+		//----------------------------------------------
+		$header_code = $verify_result['code'];
+		$rbody       = $verify_result['body'];
+
+		$card_number   = isset( $rbody['cardNumber']   ) ? sanitize_text_field( $rbody['cardNumber'] )   : '-';
+		$card_hashpan  = isset( $rbody['cardHashPan'] ) ? sanitize_text_field( $rbody['cardHashPan'] ) : '-';
+
+		// ← تکراری (409)
+		if ( $header_code === 409 ) {
+
+			$err_code = (int) ( $rbody['metaData']['code'] ?? 0 );
+
+			if ( $err_code === 110 ) {             // پرداخت قبلاً تأیید شده
+				self::handle_duplicate_payment( $entry, $form, $Transaction_ID, $Total_Money );
 				return;
 			}
-    
-			global $current_user;
-			$user_id   = 0;
-			$user_name = esc_html__( "مهمان", "payping-gravityforms" );
-			if ( $current_user && $user_data = get_userdata( $current_user->ID ) ) {
-				$user_id   = $current_user->ID;
-				$user_name = $user_data->display_name;
+
+			// سایر خطاهای 409
+			$error_message = $rbody['metaData']['errors'][0]['message'] ?? '';
+			self::handle_payment_failure(
+				$entry, $form, 'failed',
+				$error_message,
+				'اطلاعات پرداخت نامعتبر است، لطفاً مجدداً اقدام کنید.',
+				$Transaction_ID, $Total_Money
+			);
+			return;
+		}
+
+		// ← موفق (200)
+		if ( $header_code === 200 ) {
+
+			// مبلغ و کد پرداخت باید دوباره منطبق باشند
+			if (
+				( intval( $rbody['amount'] ?? 0 ) !== $Amount ) ||
+				( ( $rbody['code'] ?? '' ) !== self::get_stored_payment_code( $entry_id ) )
+			) {
+				self::handle_payment_failure(
+					$entry, $form, 'failed',
+					'اطلاعات برگشتی با سفارش مطابقت ندارد.',
+					'تراکنش نامعتبر است.',
+					$Transaction_ID, $Total_Money
+				);
+				return;
 			}
 
-			$transaction_type = 1;
-			if ( ! empty( $config["meta"]["type"] ) && $config["meta"]["type"] == 'subscription' ) {
-				$transaction_type = 2;
-			}
+			// موفقیت نهایی
+			self::handle_payment_success(
+				$entry, $form,
+				$Transaction_ID, $card_number, $card_hashpan, $Amount,
+				$transaction_type
+			);
+			return;
+		}
 
-			if ( $payment_type == 'custom' ) {
-				$Amount = $Total = gform_get_meta( $entry["id"], 'hannanstd_part_price_' . $form_id );
-			} else {
-				$Amount = $Total = self::get_order_total( $form, $entry );
-			}
-			$Total_Money = GFCommon::to_money( $Total, $entry["currency"] );
-
-			$free = false;
-			if ( empty( $_GET['no'] ) || $_GET['no'] != 'true' ) {
-
-				//Start of payping
-				if ( $payment_type != 'custom' ) {
-					$Amount = GFPersian_Payments::amount( $Amount, 'IRT', $form, $entry );
-				}
-
-					$Authority = isset($_GET['refid']) ? sanitize_text_field($_GET['refid']) : '';
-					$MerchantID = self::get_merchent();
-
-					try {
-						$data = array('refId' => sanitize_text_field($_GET['refid']), 'amount' => $Amount);
-					
-						$url = "https://api.payping.ir/v1/pay/verify";
-						$headers = array(
-							"Accept" => "application/json",
-							"Authorization" => "Bearer " . $MerchantID,
-							"Cache-Control" => "no-cache",
-							"Content-Type" => "application/json",
-						);
-					
-						$response = wp_remote_post(
-							$url,
-							array(
-								"body" => wp_json_encode($data),
-								"headers" => $headers,
-								"timeout" => 30,
-							)
-						);
-					
-						if (is_wp_error($response)) {
-							$Status = 'failed';
-							$Fault = 'Curl Error.';
-							$Message = 'خطا در ارتباط به پی‌پینگ : شرح خطا ' . $response->get_error_message();
-						} else {
-							$header = wp_remote_retrieve_response_code($response);
-					
-							if ($header == 200) {
-								$body = wp_remote_retrieve_body($response);
-								$response = json_decode($body, true);
-					
-								if (isset($_GET["refid"]) && $_GET["refid"] != '') {
-									$Status = 'completed';
-								} else {
-									$Message = 'متافسانه سامانه قادر به دریافت کد پیگیری نمی باشد! ';
-									$Status = 'failed';
-								}
-							} elseif ($header == 400) {
-								$body = wp_remote_retrieve_body($response);
-								$Message = implode('. ', array_values(json_decode($body, true)));
-								$Status = 'failed';
-							} else {
-								$Message = self::Fault($header) . '(' . $header . ')';
-								$Status = 'failed';
-							}
-						}
-					} catch (Exception $e) {
-						$Message = $e->getMessage();
-						$Status = 'failed';
-					}
-					
-                
-				$Transaction_ID = isset($_GET['refid']) ? absint($_GET['refid']) : '-';
-				//End of payping
-			} else {
-				$Status         = 'completed';
-				$Message        = '';
-				$Transaction_ID = apply_filters( self::$author . '_gf_rand_transaction_id', GFPersian_Payments::transaction_id( $entry ), $form, $entry );
-				$free           = true;
-			}
-
-			$Status         = ! empty( $Status ) ? $Status : 'failed';
-			$transaction_id = ! empty( $Transaction_ID ) ? $Transaction_ID : '';
-			$transaction_id = apply_filters( self::$author . '_gf_real_transaction_id', $transaction_id, $Status, $form, $entry );
-
-			//----------------------------------------------------------------------------------------
-			$entry["payment_date"]     = gmdate( "Y-m-d H:i:s" );
-			$entry["transaction_id"]   = $transaction_id;
-			$entry["transaction_type"] = $transaction_type;
-
-			if ( $Status == 'completed' ) {
-
-				$entry["is_fulfilled"]   = 1;
-				$entry["payment_amount"] = $Total;
-
-				if ( $transaction_type == 2 ) {
-					$entry["payment_status"] = "Active";
-					RGFormsModel::add_note( $entry["id"], $user_id, $user_name, esc_html__( "تغییرات اطلاعات فیلدها فقط در همین پیام ورودی اعمال خواهد شد و بر روی وضعیت کاربر تاثیری نخواهد داشت .", "payping-gravityforms" ) );
-				} else {
-					$entry["payment_status"] = "Paid";
-				}
-
-				if ( $free == true ) {
-					//unset( $entry["payment_status"] );
-					unset( $entry["payment_amount"] );
-					unset( $entry["payment_method"] );
-					unset( $entry["is_fulfilled"] );
-					gform_delete_meta( $entry['id'], 'payment_gateway' );
-					$Note = sprintf( esc_html__( 'وضعیت پرداخت : رایگان - بدون نیاز به درگاه پرداخت', "payping-gravityforms" ) );
-				} else {
-					$Note = sprintf( esc_html__( 'وضعیت پرداخت : موفق - مبلغ پرداختی : %s - کد تراکنش : %s', "payping-gravityforms" ), $Total_Money, $transaction_id );
-				}
-
-				GFAPI::update_entry( $entry );
+		//----------------------------------------------
+		// ـــ ۱۰) سایر کدهای HTTP (400 … 5xx)
+		//----------------------------------------------
+		self::handle_payment_failure(
+			$entry, $form, 'failed',
+			self::Fault( $header_code ) . " ({$header_code})",
+			'خطای نامشخص در تأیید پرداخت!',
+			$Transaction_ID, $Total_Money
+		);
+	}
 
 
-				if ( apply_filters( self::$author . '_gf_payping_post', apply_filters( self::$author . '_gf_gateway_post', ( $payment_type != 'custom' ), $form, $entry ), $form, $entry ) ) {
+	/* ======================================================================
+	*                    متدهای کمکی (private static)
+	* ====================================================================*/
 
-					$has_post = GFCommon::has_post_field( $form["fields"] ) ? true : false;
+	/**
+	 *  اعتبارسنجی اولیه دادهٔ بازگشتی (مبلغ، کد پرداخت …)
+	 *  @return string متن خطا یا false
+	 */
+	private static function validate_return_data( $entry, $expected_amount, $responseData ) {
 
-					if ( ! empty( $config["meta"]["update_post_action1"] ) && $config["meta"]["update_post_action1"] != 'default' ) {
-						$new_status = $config["meta"]["update_post_action1"];
-					} else {
-						$new_status = rgar( $form, 'postStatus' );
-					}
+		$entry_id = (int) $entry['id'];
 
-					if ( empty( $entry["post_id"] ) && $has_post ) {
-						$form['postStatus'] = $new_status;
-						RGFormsModel::create_post( $form, $entry );
-						$entry = GFPersian_Payments::get_entry( $entry_id );
-					}
+		// ← وجود کد پرداخت ذخیره‌شده
+		$stored_payment_code = self::get_stored_payment_code( $entry_id );
+		if ( ! $stored_payment_code ) {
+			return 'کد پرداخت ذخیره نشده است.';
+		}
 
-					if ( ! empty( $entry["post_id"] ) && $has_post ) {
-						$post = get_post( $entry["post_id"] );
-						if ( is_object( $post ) ) {
-							if ( $new_status != $post->post_status ) {
-								$post->post_status = $new_status;
-								wp_update_post( $post );
-							}
-						}
-					}
-				}
+		// ← پارامتر paymentCode در پاسخ
+		if ( empty( $responseData['paymentCode'] ) ) {
+			return 'پارامتر کد پرداخت در پاسخ یافت نشد.';
+		}
 
-				if ( ! empty( $__params ) ) {
-					GFPersian_Payments::set_verification( $entry, __CLASS__, $__params );
-				}
+		// ← تطابق کد پرداخت
+		if ( $responseData['paymentCode'] !== $stored_payment_code ) {
+			return sprintf(
+				'کد پرداخت برگشتی (%s) با کد ذخیره‌شده (%s) مطابقت ندارد.',
+				$responseData['paymentCode'], $stored_payment_code
+			);
+		}
 
-				$user_registration_slug = apply_filters( 'ppgf_user_registration_slug', 'gravityformsuserregistration' );
-				$paypal_config          = array( 'meta' => array() );
-				if ( ! empty( $config["meta"]["addon"] ) && $config["meta"]["addon"] == 'true' ) {
-					if ( class_exists( 'GFAddon' ) && method_exists( 'GFAddon', 'get_registered_addons' ) ) {
-						$addons = GFAddon::get_registered_addons();
-						foreach ( (array) $addons as $addon ) {
-							if ( is_callable( array( $addon, 'get_instance' ) ) ) {
-								$addon = call_user_func( array( $addon, 'get_instance' ) );
-								if ( is_object( $addon ) && method_exists( $addon, 'get_slug' ) ) {
-									$slug = $addon->get_slug();
-									if ( $slug != $user_registration_slug ) {
-										$paypal_config['meta'][ 'delay_' . $slug ] = true;
-									}
-								}
-							}
-						}
-					}
-				}
-				if ( ! empty( $config["meta"]["type"] ) && $config["meta"]["type"] == "subscription" ) {
-					$paypal_config['meta'][ 'delay_' . $user_registration_slug ] = true;
-				}
+		// ← تطابق مبلغ
+		$returned_amount = intval( $responseData['amount'] ?? 0 );
+		if ( $returned_amount !== $expected_amount ) {
+			return sprintf(
+				'مبلغ پرداختی (%s) با مبلغ سفارش (%s) مطابقت ندارد.',
+				number_format( $returned_amount ),
+				number_format( $expected_amount )
+			);
+		}
 
-				do_action( "gform_payping_fulfillment", $entry, $config, $transaction_id, $Total );
-				do_action( "gform_gateway_fulfillment", $entry, $config, $transaction_id, $Total );
-				do_action( "gform_paypal_fulfillment", $entry, $paypal_config, $transaction_id, $Total );
-			} else if ( $Status == 'cancelled' ) {
-				$entry["payment_status"] = "Cancelled";
-				$entry["payment_amount"] = 0;
-				$entry["is_fulfilled"]   = 0;
-				GFAPI::update_entry( $entry );
+		return false; // همه‌چیز OK
+	}
 
-				$Note = sprintf( esc_html__( 'وضعیت پرداخت : منصرف شده - مبلغ قابل پرداخت : %s - کد تراکنش : %s', "payping-gravityforms" ), $Total_Money, $transaction_id );
-			} else {
-				$entry["payment_status"] = "Failed";
-				$entry["payment_amount"] = 0;
-				$entry["is_fulfilled"]   = 0;
-				GFAPI::update_entry( $entry );
+	/**
+	 *  ارسال درخواست Verify به PayPing
+	 *  @return array|WP_Error ['code'=> int , 'body'=> array]
+	 */
+	private static function verify_with_payping( $paymentRefId, $paymentCode, $amount ) {
 
-				$Note = sprintf( esc_html__( 'وضعیت پرداخت : ناموفق - مبلغ قابل پرداخت : %s - کد تراکنش : %s - علت خطا : %s', "payping-gravityforms" ), $Total_Money, $transaction_id, $Message );
-			}
+		$MerchantID = self::get_merchent();
 
-			$entry = GFPersian_Payments::get_entry( $entry_id );
-			RGFormsModel::add_note( $entry["id"], $user_id, $user_name, $Note );
-			do_action( 'gform_post_payment_status', $config, $entry, strtolower( $Status ), $transaction_id, '', $Total, '', '' );
-			do_action( 'gform_post_payment_status_' . __CLASS__, $config, $form, $entry, strtolower( $Status ), $transaction_id, '', $Total, '', '' );
+		$data = [
+			'PaymentRefId' => $paymentRefId,
+			'PaymentCode'  => $paymentCode,
+			'Amount'       => $amount,
+		];
 
+		$response = wp_safe_remote_post(
+			'https://api.payping.ir/v3/pay/verify',
+			[
+				'body'        => wp_json_encode( $data ),
+				'headers'     => [
+					'Accept'        => 'application/json',
+					'Authorization' => "Bearer {$MerchantID}",
+					'Content-Type'  => 'application/json',
+				],
+				'timeout'     => 30,
+				'data_format' => 'body',
+			]
+		);
 
-			if ( apply_filters( self::$author . '_gf_payping_verify', apply_filters( self::$author . '_gf_gateway_verify', ( $payment_type != 'custom' ), $form, $entry ), $form, $entry ) ) {
-				GFPersian_Payments::notification( $form, $entry );
-				GFPersian_Payments::confirmation( $form, $entry, $Message );
-			}
+		if ( is_wp_error( $response ) ) {
+			return $response;   // WP_Error برمی‌گردانیم
+		}
+
+		return [
+			'code' => wp_remote_retrieve_response_code( $response ),
+			'body' => json_decode( wp_remote_retrieve_body( $response ), true ) ?: [],
+		];
+	}
+
+	/**
+	 *  بازیابی کد پرداخت ذخیره‌شده در متای GravityForms
+	 */
+	private static function get_stored_payment_code( $entry_id ) {
+		$code = gform_get_meta( $entry_id, '_payping_payCode' );
+		if ( ! $code ) {
+			$code = gform_get_meta( $entry_id, 'payping_payment_code' ); // سازگاری قدیمی
+		}
+		return $code;
+	}
+
+	/**
+	 *  ثبت پرداخت موفق + به‌روزرسانی Entry
+	 */
+	private static function handle_payment_success( $entry, $form, $transaction_id, $card_number, $card_hashpan, $amount, $transaction_type ) {
+
+		$user = wp_get_current_user();
+		$user_id   = $user->ID ?: 0;
+		$user_name = $user->display_name ?: esc_html__( 'مهمان', 'payping-gravityforms' );
+
+		gform_update_meta( $entry['id'], 'payping_card_hashpan', $card_hashpan );
+
+		$entry['payment_date']     = gmdate( 'Y-m-d H:i:s' );
+		$entry['transaction_id']   = $transaction_id;
+		$entry['payment_amount']   = $amount;
+		$entry['payment_status']   = ( $transaction_type === 2 ) ? 'Active' : 'Paid';
+		$entry['transaction_type'] = $transaction_type;
+		$entry['is_fulfilled']     = 1;
+
+		GFAPI::update_entry( $entry );
+
+		$note = sprintf(
+			esc_html__( 'وضعیت پرداخت : موفق - مبلغ پرداختی : %s - کد تراکنش : %s | شماره کارت: %s | هش کارت: %s', 'payping-gravityforms' ),
+			GFCommon::to_money( $amount, $entry['currency'] ),
+			$transaction_id,
+			$card_number,
+			$card_hashpan
+		);
+
+		RGFormsModel::add_note( $entry['id'], $user_id, $user_name, $note );
+
+		// اقدام‌های بعد از پرداخت (پست، اعلان، تاییدیه …)
+		self::after_payment_actions( $entry, $form, $transaction_id, $amount );
+	}
+
+	/**
+	 *  مدیریت پرداخت تکراری (409/110)
+	 */
+	private static function handle_duplicate_payment( $entry, $form, $transaction_id, $total_money ) {
+
+		$user = wp_get_current_user();
+		$user_id   = $user->ID ?: 0;
+		$user_name = $user->display_name ?: esc_html__( 'مهمان', 'payping-gravityforms' );
+
+		$entry['payment_date']   = gmdate( 'Y-m-d H:i:s' );
+		$entry['payment_status'] = 'Paid';
+		$entry['transaction_id'] = $transaction_id;
+		$entry['is_fulfilled']   = 1;
+
+		GFAPI::update_entry( $entry );
+
+		$note = sprintf(
+			esc_html__( 'این سفارش قبلاً تأیید شده است. - مبلغ: %s - کد تراکنش: %s', 'payping-gravityforms' ),
+			$total_money,
+			$transaction_id
+		);
+		RGFormsModel::add_note( $entry['id'], $user_id, $user_name, $note );
+
+		self::after_payment_actions( $entry, $form, $transaction_id, $total_money, true );
+	}
+
+	/**
+	 *  ثبت خطا / انصراف و بروزرسانی Entry
+	 */
+	private static function handle_payment_failure( $entry, $form, $status, $message, $fault, $transaction_id, $total_money ) {
+
+		$user = wp_get_current_user();
+		$user_id   = $user->ID ?: 0;
+		$user_name = $user->display_name ?: esc_html__( 'مهمان', 'payping-gravityforms' );
+
+		$entry['payment_date']   = gmdate( 'Y-m-d H:i:s' );
+		$entry['payment_status'] = ucfirst( $status );   // Failed | Cancelled
+		$entry['transaction_id'] = $transaction_id;
+		$entry['payment_amount'] = 0;
+		$entry['is_fulfilled']   = 0;
+
+		GFAPI::update_entry( $entry );
+
+		if ( $status === 'cancelled' ) {
+			$note = sprintf(
+				esc_html__( 'وضعیت پرداخت : منصرف شده - مبلغ قابل پرداخت : %s - کد تراکنش : %s', 'payping-gravityforms' ),
+				$total_money, $transaction_id
+			);
+		} else {
+			$note = sprintf(
+				esc_html__( 'وضعیت پرداخت : ناموفق - مبلغ قابل پرداخت : %s - کد تراکنش : %s - علت خطا : %s', 'payping-gravityforms' ),
+				$total_money, $transaction_id, $message
+			);
+		}
+
+		RGFormsModel::add_note( $entry['id'], $user_id, $user_name, $note );
+
+		// اعلان و تاییدیه دلخواه
+		GFPersian_Payments::notification( $form, $entry );
+		GFPersian_Payments::confirmation(  $form, $entry, $fault );
+	}
+
+	/**
+	 *  اقدام‌های پس از پرداخت موفق / تکراری (اعلان، پست، Add-On ها …)
+	 */
+	private static function after_payment_actions( $entry, $form, $transaction_id, $amount, $duplicate = false ) {
+
+		$config = self::get_config_by_entry( $entry ); // همان کانفیگ اولیه
+		do_action( 'gform_payping_fulfillment',  $entry, $config, $transaction_id, $amount );
+		do_action( 'gform_gateway_fulfillment',  $entry, $config, $transaction_id, $amount );
+
+		// اعلان‌ها و تاییدیه
+		if ( apply_filters( self::$author . '_gf_payping_verify', true, $form, $entry ) ) {
+			GFPersian_Payments::notification( $form, $entry );
+			GFPersian_Payments::confirmation(  $form, $entry, $duplicate ? 'پرداخت قبلاً تأیید شده بود.' : '' );
 		}
 	}
+
 
 
 	// #6
