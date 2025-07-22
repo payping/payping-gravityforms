@@ -2101,7 +2101,7 @@ class GFPersian_Gateway_payping {
 			$url = "https://api.payping.ir/v3/pay";
 			$headers = array(
 				'X-Platform'         => 'GravityForms',
-        		'X-Platform-Version' => '2.3.1',
+        		'X-Platform-Version' => '2.4.4',
 				"Accept" => "application/json",
 				"Authorization" => "Bearer " . self::get_merchent(),
 				"Cache-Control" => "no-cache",
