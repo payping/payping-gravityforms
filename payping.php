@@ -2236,8 +2236,9 @@ class GFPersian_Gateway_payping {
 			: intval( $Amount );
 
 		$Total_Money = GFCommon::to_money( $Amount, $entry['currency'] );
+		$Total_Money = str_replace('ریال', 'تومان', $Total_Money);
 		$transaction_type = ( ! empty( $config['meta']['type'] ) && $config['meta']['type'] === 'subscription' ) ? 2 : 1;
-
+		
 		//----------------------------------------------
 		// ـــ ۵) واکشی و پاک‌سازی دادهٔ برگشتی درگاه
 		//----------------------------------------------
@@ -2247,7 +2248,11 @@ class GFPersian_Gateway_payping {
 		$Transaction_ID  = isset( $responseData['paymentRefId'] ) ? sanitize_text_field( $responseData['paymentRefId'] ) : null;
 		$CardNumber      = isset( $responseData['cardNumber']   ) ? sanitize_text_field( $responseData['cardNumber']   ) : '-';
 		
-		
+		//var_dump($entry["payment_status"]); die();
+		if ($entry["payment_status"] === 'Paid') {
+			self::handle_duplicate_payment( $entry, $form, $Transaction_ID, $Total_Money );
+			return;
+		}
 		//----------------------------------------------
 		// ـــ ۶) مسیر انصراف کاربر
 		//----------------------------------------------
@@ -2479,8 +2484,7 @@ class GFPersian_Gateway_payping {
 		GFAPI::update_entry( $entry );
 
 		$note = sprintf(
-			esc_html__( 'وضعیت پرداخت : موفق - مبلغ پرداختی : %s - کد تراکنش : %s | شماره کارت: %s | هش کارت: %s', 'payping-gravityforms' ),
-			GFCommon::to_money( $amount, $entry['currency'] ),
+			esc_html__( 'وضعیت پرداخت : موفق - کد تراکنش : %s | شماره کارت: %s | هش کارت: %s', 'payping-gravityforms' ),
 			$transaction_id,
 			$card_number,
 			$card_hashpan
@@ -2509,8 +2513,7 @@ class GFPersian_Gateway_payping {
 		GFAPI::update_entry( $entry );
 
 		$note = sprintf(
-			esc_html__( 'این سفارش قبلاً تأیید شده است. - مبلغ: %s - کد تراکنش: %s', 'payping-gravityforms' ),
-			$total_money,
+			esc_html__( 'این سفارش قبلاً تأیید شده است. - کد تراکنش: %s', 'payping-gravityforms' ),
 			$transaction_id
 		);
 		RGFormsModel::add_note( $entry['id'], $user_id, $user_name, $note );
@@ -2537,13 +2540,13 @@ class GFPersian_Gateway_payping {
 
 		if ( $status === 'cancelled' ) {
 			$note = sprintf(
-				esc_html__( 'وضعیت پرداخت : منصرف شده - مبلغ قابل پرداخت : %s - کد تراکنش : %s', 'payping-gravityforms' ),
-				$total_money, $transaction_id
+				esc_html__( 'وضعیت پرداخت : منصرف شده -  کد تراکنش : %s', 'payping-gravityforms' ),
+				$transaction_id
 			);
 		} else {
 			$note = sprintf(
-				esc_html__( 'وضعیت پرداخت : ناموفق - مبلغ قابل پرداخت : %s - کد تراکنش : %s - علت خطا : %s', 'payping-gravityforms' ),
-				$total_money, $transaction_id, $message
+				esc_html__( 'وضعیت پرداخت : ناموفق - کد تراکنش : %s - علت خطا : %s', 'payping-gravityforms' ),
+				$transaction_id, $message
 			);
 		}
 
