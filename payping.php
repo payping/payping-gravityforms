@@ -2082,20 +2082,21 @@ class GFPersian_Gateway_payping {
 		if ( ! $custom ) {
 			$Amount = GFPersian_Payments::amount( $Amount, 'IRT', $form, $entry );
 		}
-
+		
 		//$Email = !filter_var($Email, FILTER_VALIDATE_EMAIL) === false ? $Email : '';
 		//$Mobile = preg_match('/^09[0-9]{9}/i', $Mobile) ? $Mobile : '';
 
 
 		$data = array(
 			'PayerName' => $user_name,
-			'Amount' => $Amount,
+			'Amount' => absint($Amount),
 			'PayerIdentity' => $Mobile,
 			'ReturnUrl' => $ReturnPath,
 			'Description' => $Description,
 			'ClientRefId' => $entry_id,
 			'NationalCode'	=> ''
 		);
+		
 		try {
 			$url = "https://api.payping.ir/v3/pay";
 			$headers = array(
@@ -2123,10 +2124,10 @@ class GFPersian_Gateway_payping {
 				if ($header == 200) {
 					$body = wp_remote_retrieve_body($response);
 					$response = json_decode($body, true);
-		
+					
 					if (isset($response["paymentCode"]) && $response["paymentCode"] != '') {
+						gform_update_meta( $entry['id'], 'payping_payCode', $response["paymentCode"] );
 						$Payment_URL = sprintf('https://api.payping.ir/v3/pay/start/%s', $response["paymentCode"]);
-						
 						if ($valid_checker) {
 							return true;
 						} else {
@@ -2189,7 +2190,7 @@ class GFPersian_Gateway_payping {
 		if ( ! self::is_gravityforms_supported() ) {
 			return;
 		}
-
+		
 		// ـــ ۲) اعتبارسنجی ورودی‌های پایه (form_id , entry_id)
 		$form_id  = absint( rgget( 'id'   ) );
 		$entry_id = absint( rgget( 'entry') );
@@ -2201,12 +2202,12 @@ class GFPersian_Gateway_payping {
 		if ( is_wp_error( $entry ) ) {
 			return;
 		}
-
+		
 		// فقط پاسخ‌های مربوط به درگاه PayPing
 		if ( empty( $entry['payment_method'] ) || $entry['payment_method'] !== 'payping' ) {
 			return;
 		}
-
+		
 		//----------------------------------------------
 		// ـــ ۳) بازیابی فرم و کانفیگ
 		//----------------------------------------------
@@ -2229,8 +2230,9 @@ class GFPersian_Gateway_payping {
 			? gform_get_meta( $entry_id, 'hannanstd_part_price_' . $form_id )
 			: self::get_order_total( $form, $entry );
 
+		
 		$Amount = ( $payment_type !== 'custom' )
-			? GFPersian_Payments::amount( $Amount, 'IRT', $form, $entry )   // تطبیق ارز
+			? intval( GFPersian_Payments::amount( $Amount, 'IRT', $form, $entry ) )
 			: intval( $Amount );
 
 		$Total_Money = GFCommon::to_money( $Amount, $entry['currency'] );
@@ -2241,11 +2243,11 @@ class GFPersian_Gateway_payping {
 		//----------------------------------------------
 		$raw_data     = isset( $_REQUEST['data'] ) ? wp_unslash( $_REQUEST['data'] ) : '';
 		$responseData = json_decode( $raw_data, true ) ?: [];
-
 		$status          = isset( $_REQUEST['status'] ) ? absint( $_REQUEST['status'] ) : null;
 		$Transaction_ID  = isset( $responseData['paymentRefId'] ) ? sanitize_text_field( $responseData['paymentRefId'] ) : null;
 		$CardNumber      = isset( $responseData['cardNumber']   ) ? sanitize_text_field( $responseData['cardNumber']   ) : '-';
-
+		
+		
 		//----------------------------------------------
 		// ـــ ۶) مسیر انصراف کاربر
 		//----------------------------------------------
@@ -2281,7 +2283,7 @@ class GFPersian_Gateway_payping {
 			self::get_stored_payment_code( $entry_id ),
 			$Amount
 		);
-
+		
 		// خطای ارتباط
 		if ( is_wp_error( $verify_result ) ) {
 			self::handle_payment_failure(
@@ -2301,12 +2303,12 @@ class GFPersian_Gateway_payping {
 
 		$card_number   = isset( $rbody['cardNumber']   ) ? sanitize_text_field( $rbody['cardNumber'] )   : '-';
 		$card_hashpan  = isset( $rbody['cardHashPan'] ) ? sanitize_text_field( $rbody['cardHashPan'] ) : '-';
-
+		
 		// ← تکراری (409)
 		if ( $header_code === 409 ) {
 
 			$err_code = (int) ( $rbody['metaData']['code'] ?? 0 );
-
+			
 			if ( $err_code === 110 ) {             // پرداخت قبلاً تأیید شده
 				self::handle_duplicate_payment( $entry, $form, $Transaction_ID, $Total_Money );
 				return;
@@ -2375,6 +2377,7 @@ class GFPersian_Gateway_payping {
 
 		// ← وجود کد پرداخت ذخیره‌شده
 		$stored_payment_code = self::get_stored_payment_code( $entry_id );
+		
 		if ( ! $stored_payment_code ) {
 			return 'کد پرداخت ذخیره نشده است.';
 		}
@@ -2394,6 +2397,7 @@ class GFPersian_Gateway_payping {
 
 		// ← تطابق مبلغ
 		$returned_amount = intval( $responseData['amount'] ?? 0 );
+		
 		if ( $returned_amount !== $expected_amount ) {
 			return sprintf(
 				'مبلغ پرداختی (%s) با مبلغ سفارش (%s) مطابقت ندارد.',
@@ -2418,7 +2422,7 @@ class GFPersian_Gateway_payping {
 			'PaymentCode'  => $paymentCode,
 			'Amount'       => $amount,
 		];
-
+		
 		$response = wp_safe_remote_post(
 			'https://api.payping.ir/v3/pay/verify',
 			[
@@ -2432,7 +2436,7 @@ class GFPersian_Gateway_payping {
 				'data_format' => 'body',
 			]
 		);
-
+		
 		if ( is_wp_error( $response ) ) {
 			return $response;   // WP_Error برمی‌گردانیم
 		}
@@ -2447,7 +2451,7 @@ class GFPersian_Gateway_payping {
 	 *  بازیابی کد پرداخت ذخیره‌شده در متای GravityForms
 	 */
 	private static function get_stored_payment_code( $entry_id ) {
-		$code = gform_get_meta( $entry_id, '_payping_payCode' );
+		$code = gform_get_meta( $entry_id, 'payping_payCode' );
 		if ( ! $code ) {
 			$code = gform_get_meta( $entry_id, 'payping_payment_code' ); // سازگاری قدیمی
 		}
