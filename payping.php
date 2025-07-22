@@ -2248,7 +2248,7 @@ class GFPersian_Gateway_payping {
 		$Transaction_ID  = isset( $responseData['paymentRefId'] ) ? sanitize_text_field( $responseData['paymentRefId'] ) : null;
 		$CardNumber      = isset( $responseData['cardNumber']   ) ? sanitize_text_field( $responseData['cardNumber']   ) : '-';
 		
-		//var_dump($entry["payment_status"]); die();
+		
 		if ($entry["payment_status"] === 'Paid') {
 			self::handle_duplicate_payment( $entry, $form, $Transaction_ID, $Total_Money );
 			return;
