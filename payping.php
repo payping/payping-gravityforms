@@ -2252,7 +2252,16 @@ class GFPersian_Gateway_payping {
 		if ($entry["payment_status"] === 'Paid') {
 			self::handle_duplicate_payment( $entry, $form, $Transaction_ID, $Total_Money );
 			return;
+		} else if ($entry["payment_status"] === 'Cancelled') {
+			self::handle_payment_failure(
+				$entry, $form, 'cancelled',
+				'کاربر در صفحه بانک از پرداخت انصراف داده است.',
+				'تراکنش توسط شما لغو شد.',
+				$Transaction_ID, $Total_Money
+			);
+			return;
 		}
+		
 		//----------------------------------------------
 		// ـــ ۶) مسیر انصراف کاربر
 		//----------------------------------------------
@@ -2411,7 +2420,7 @@ class GFPersian_Gateway_payping {
 			);
 		}
 
-		return false; // همه‌چیز OK
+		return false; 
 	}
 
 	/**
