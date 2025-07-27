@@ -1927,7 +1927,7 @@ class GFPersian_Gateway_payping {
 			$full_name = trim("$form_first_name $form_last_name");
 			$user_name = !empty($full_name) ? $full_name : $user_name;
 		}
-		var_dump($user_name); die();
+		
 		if ( ! $valid_checker ) {
 
 			$entry_id = $entry['id'];
@@ -2115,7 +2115,7 @@ class GFPersian_Gateway_payping {
 					"timeout" => 30,
 				)
 			);
-			var_dump($data); die();
+			
 			if (is_wp_error($response)) {
 				echo "HTTP Request Error: " . esc_html($response->get_error_message());
 			} else {
