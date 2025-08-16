@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: PayPing GravityForms
-Version: 2.4.5
+Version: 2.5.0
 Description:  افزونه درگاه پرداخت پی‌پینگ برای Gravity forms
 Plugin URI: https://github.com/payping/payping-gravityforms
 Author: PayPing Team

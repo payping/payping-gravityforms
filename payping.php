@@ -17,7 +17,7 @@ class GFPersian_Gateway_payping {
 	public static $author = "HANNANStd";
 
 	// -------------------------------------------------
-	private static $version = "2.3.0";
+	private static $version = "2.5.0";
 	private static $min_gravityforms_version = "1.9.10";
 	private static $config = null;
 
@@ -28,13 +28,13 @@ class GFPersian_Gateway_payping {
 
 			return false;
 		}
-
+		
 		if ( ! self::is_gravityforms_supported() ) {
 			add_action( 'admin_notices', array( __CLASS__, 'admin_notice_gf_support' ) );
 
 			return false;
 		}
-
+		add_filter( 'gform_payment_statuses', array( __CLASS__, 'register_custom_payment_statuses' ) );
 		add_filter( 'members_get_capabilities', array( __CLASS__, "members_get_capabilities" ) );
 
 		if ( is_admin() && self::has_access() ) {
@@ -758,7 +758,6 @@ class GFPersian_Gateway_payping {
 
 	// -------------------------------------------------
 	public static function payment_entry_detail( $form_id, $entry ) {
-
 		$payment_gateway = rgar( $entry, "payment_method" );
 
 		if ( ! empty( $payment_gateway ) && $payment_gateway == "payping" ) {
@@ -801,24 +800,24 @@ class GFPersian_Gateway_payping {
 			$payment_date = $date->format( 'Y-m-d H:i:s' );
 			$payment_date = GF_jdate( 'Y-m-d H:i:s', strtotime( $payment_date ), '', date_default_timezone_get(), 'en' );
 
-			if ( $payment_status == 'Paid' ) {
-				$payment_status_persian = esc_html__( 'موفق', 'payping-gravityforms' );
-			}
-
-			if ( $payment_status == 'Active' ) {
-				$payment_status_persian = esc_html__( 'موفق', 'payping-gravityforms' );
-			}
-
-			if ( $payment_status == 'Cancelled' ) {
-				$payment_status_persian = esc_html__( 'منصرف شده', 'payping-gravityforms' );
-			}
-
-			if ( $payment_status == 'Failed' ) {
-				$payment_status_persian = esc_html__( 'ناموفق', 'payping-gravityforms' );
-			}
-
-			if ( $payment_status == 'Processing' ) {
-				$payment_status_persian = esc_html__( 'معلق', 'payping-gravityforms' );
+			$payment_status_persian = $payment_status;
+			switch ( $payment_status ) {
+				case 'Paid':
+				case 'Active':
+					$payment_status_persian = esc_html__( 'موفق', 'payping-gravityforms' );
+					break;
+				case 'Cancelled':
+					$payment_status_persian = esc_html__( 'منصرف شده', 'payping-gravityforms' );
+					break;
+				case 'Failed':
+					$payment_status_persian = esc_html__( 'ناموفق', 'payping-gravityforms' );
+					break;
+				case 'Processing':
+					$payment_status_persian = esc_html__( 'در حال انجام', 'payping-gravityforms' );
+					break;
+				case 'Pending':
+					$payment_status_persian = esc_html__( 'در انتظار بررسی', 'payping-gravityforms' );
+					break;
 			}
 
 			if ( ! strtolower( rgpost( "save" ) ) || RGForms::post( "screen_mode" ) != "edit" ) {
@@ -867,9 +866,14 @@ class GFPersian_Gateway_payping {
 					$payment_string .= '<option value="Processing">' . esc_html__( 'معلق', 'payping-gravityforms' ) . '</option>';
 				}
 
+				if ( $payment_status != "Pending" ) {
+					$payment_string .= '<option value="Pending">' . esc_html__( 'در انتظار بررسی', 'payping-gravityforms' ) . '</option>';
+				}
+
 				$payment_string .= '</select>';
 
-				echo esc_html__( 'وضعیت پرداخت :', 'payping-gravityforms' ) . esc_html( $payment_string ) . '<br/><br/>';
+				echo '<label for="payment_status">' . esc_html__( 'وضعیت پرداخت :', 'payping-gravityforms' ) . '</label> ' . $payment_string . '<br/><br/>';
+
 				?>
                 <div id="edit_payment_status_details" style="display:block">
                     <table>
@@ -996,6 +1000,10 @@ class GFPersian_Gateway_payping {
 
 			case "Processing" :
 				$new_status = esc_html__( 'معلق', 'payping-gravityforms' );
+				break;
+
+			case "Pending" :
+				$new_status = esc_html__( 'در انتظار بررسی', 'payping-gravityforms' );
 				break;
 		}
 
@@ -2101,7 +2109,7 @@ class GFPersian_Gateway_payping {
 			$url = "https://api.payping.ir/v3/pay";
 			$headers = array(
 				'X-Platform'         => 'GravityForms',
-        		'X-Platform-Version' => '2.4.4',
+        		'X-Platform-Version' => '2.5.0',
 				"Accept" => "application/json",
 				"Authorization" => "Bearer " . self::get_merchent(),
 				"Cache-Control" => "no-cache",
@@ -2126,7 +2134,10 @@ class GFPersian_Gateway_payping {
 					$response = json_decode($body, true);
 					
 					if (isset($response["paymentCode"]) && $response["paymentCode"] != '') {
-						gform_update_meta( $entry['id'], 'payping_payCode', $response["paymentCode"] );
+						 if (!$valid_checker) {
+							gform_update_meta( $entry['id'], 'payping_payCode', $response["paymentCode"] );
+						}
+						
 						$Payment_URL = sprintf('https://api.payping.ir/v3/pay/start/%s', $response["paymentCode"]);
 						if ($valid_checker) {
 							return true;
@@ -2138,7 +2149,13 @@ class GFPersian_Gateway_payping {
 					}
 				} elseif ($header == 400) {
 					$body = wp_remote_retrieve_body($response);
-					$Message = implode('. ', array_values(json_decode($body, true)));
+					$response = json_decode($body, true);
+					if (isset($response['metaData']['errors'][0]['message'])) {
+						$Message = $response['metaData']['errors'][0]['message'];
+					} else {
+						$Message = 'پیامی یافت نشد';
+					}
+					
 				} else {
 					$Message = self::Fault($header) . '(' . $header . ')';
 				}
@@ -2147,8 +2164,8 @@ class GFPersian_Gateway_payping {
 			$Message = 'تراکنش ناموفق بود- شرح خطا سمت برنامه شما : ' . $e->getMessage();
 		}
 		
-			$Message = ! empty( $Message ) ? $Message : esc_html__( 'خطایی رخ داده است.', 'payping-gravityforms' );
-
+		$Message = ! empty( $Message ) ? $Message : esc_html__( 'خطایی رخ داده است.', 'payping-gravityforms' );
+		
 
 
 
@@ -2452,7 +2469,7 @@ class GFPersian_Gateway_payping {
 		);
 		
 		if ( is_wp_error( $response ) ) {
-			return $response;   // WP_Error برمی‌گردانیم
+			return $response;   
 		}
 
 		return [
@@ -2467,7 +2484,7 @@ class GFPersian_Gateway_payping {
 	private static function get_stored_payment_code( $entry_id ) {
 		$code = gform_get_meta( $entry_id, 'payping_payCode' );
 		if ( ! $code ) {
-			$code = gform_get_meta( $entry_id, 'payping_payment_code' ); // سازگاری قدیمی
+			$code = gform_get_meta( $entry_id, 'payping_payment_code' ); 
 		}
 		return $code;
 	}
@@ -2611,5 +2628,13 @@ class GFPersian_Gateway_payping {
 		}
 		return '';
 	}
-
+	public static function register_custom_payment_statuses( $statuses ) {
+        $statuses['Paid']       = 'موفق';
+        $statuses['Active']     = 'موفق (عضویت)';
+        $statuses['Failed']     = 'ناموفق';
+        $statuses['Cancelled']  = 'منصرف شده';
+        $statuses['Processing'] = 'در حال انجام';
+        $statuses['Pending']    = 'در انتظار بررسی';
+        return $statuses;
+    }
 }
