@@ -1,19 +1,19 @@
 .gforms_form_settings select {
-    width: 180px !important;
+    width: 180px;
 }
 
 .delete_this_condition, .add_new_condition {
-    text-decoration: none !important;
+    text-decoration: none;
     color: #000;
-    outline: none !important;
+    outline: none;
 }
 
 #gf_payping_conditional_container *, .delete_this_condition *, .add_new_condition * {
-    outline: none !important;
+    outline: none;
 }
 
 .condition_field_value {
-    width: 150px !important;
+    width: 150px;
 }
 
 table.gforms_form_settings th {
@@ -103,11 +103,11 @@ table.gforms_form_settings th {
 }
 
 .ui-datepicker-title select, .ui-datepicker-title option {
-    font-size: 11px !important;
+    font-size: 11px;
 }
 
 .ui-datepicker th {
-    font-size: 12px !important;
+    font-size: 12px;
 }
 
 

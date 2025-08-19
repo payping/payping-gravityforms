@@ -1,8 +1,7 @@
 
-    var dp = jQuery.noConflict();
-	dp(document).ready(function () {
-	    jQuery('.datepicker').datepicker({
-			dateFormat: 'yy-mm-dd',
+    jQuery(document).ready(function () {
+	    jQuery(".datepicker").datepicker({
+			dateFormat: "yy-mm-dd",
 			showButtonPanel: true,
 			changeMonth: true,
 			changeYear: true

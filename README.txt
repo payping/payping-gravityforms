@@ -5,7 +5,7 @@ Requires at least: 4.0.0
 Requires Plugin: persian-gravity-forms
 Tested up to: 6.8.2
 Requires PHP: 7.2
-Stable tag: 2.5.0
+Stable tag: 2.5.1
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -46,3 +46,6 @@ This plugin follows strict privacy guidelines. When using the api.payping.ir ser
 
 == 2.5.0 ==
 رفع مشکلات گزارش شده
+
+== 2.5.1 ==
+رفع مشکل تداخل با ووکامرس
